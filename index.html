@@ -131,6 +131,7 @@
             opacity: 1;
             border-color: #ffd700;
             box-shadow: 0 8px 24px rgba(0,0,0,0.6);
+            cursor: pointer;
         }
 
         .character-name {
@@ -1257,6 +1258,19 @@
                     <div class="character-job">${char.job}</div>
                     <div class="character-skill">【特技】${char.skill}</div>
                 `;
+                // activeなカードをタップ→バトル開始、非activeはそちらへ移動
+                card.addEventListener('click', () => {
+                    const realIndex = currentCharacterIndex + 1;
+                    if (index === realIndex) {
+                        // 選択中のカード → バトル開始
+                        playSound('se_start');
+                        startBattle();
+                    } else if (index < realIndex) {
+                        prevCharacter();
+                    } else {
+                        nextCharacter();
+                    }
+                });
                 list.appendChild(card);
             });
 
