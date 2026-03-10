@@ -4,6 +4,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>江戸戯掛 札戦</title>
+    <!-- Google Analytics -->
+    <!-- TODO: 下記の GA_MEASUREMENT_ID をトラッキングIDに差し替えてください -->
+    <!-- 例: G-XXXXXXXXXX -->
+  
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-6C0TEE5JWB"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-6C0TEE5JWB');
+    </script>
+  
     <style>
         * {
             margin: 0;
@@ -233,9 +245,10 @@
         }
 
         .character-info-image {
-            width: 100px;
-            height: 140px;
-            object-fit: contain;
+            width: 110px;
+            height: 130px;
+            object-fit: cover;
+            object-position: center 10%;
             border-radius: 8px;
             border: 2px solid #d4a574;
             flex-shrink: 0;
@@ -264,7 +277,7 @@
         }
 
         .stars {
-            font-size: 1.8em;
+            font-size: 2.4em;
             margin: 8px 0;
             min-height: auto;
             display: flex;
@@ -312,15 +325,14 @@
         .card {
             width: 70px;
             height: 95px;
-            background: white;
+            background: #fff;
             border: 2px solid #555;
             border-radius: 8px;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            font-size: 1.4em;
-            font-weight: bold;
+            gap: 4px;
             cursor: pointer;
             transition: all 0.3s;
         }
@@ -335,6 +347,9 @@
 
         .card.red { color: #cc0000; }
         .card.black { color: #111; }
+
+        .card-suit { font-size: 1.8em; line-height: 1; }
+        .card-rank  { font-size: 1.3em; font-weight: 900; line-height: 1; }
 
         .card-back {
             background: #080808;
@@ -353,8 +368,6 @@
             position: absolute;
             top: 0; left: 0;
         }
-
-        .card-suit { font-size: 0.65em; }
 
         /* 中央エリア */
         .center-area {
@@ -754,7 +767,7 @@
             }
             .enemy-area .char-name { font-size: 0.9em; margin-bottom: 0; }
             .enemy-area .char-job { font-size: 0.78em; margin-bottom: 0; }
-            .enemy-area .stars { font-size: 1em; margin: 0; }
+            .enemy-area .stars { font-size: 1.3em; margin: 0; }
             .enemy-area .char-skill { font-size: 0.7em; margin-top: 0; line-height: 1.4; width: 100%; }
             .enemy-area .hand-area { padding: 8px 10px; border-width: 1px; }
             .enemy-area .hand-label { font-size: 0.85em; margin-bottom: 6px; }
@@ -767,6 +780,8 @@
             .player-area .character-info-image {
                 width: 64px;
                 height: 88px;
+                object-fit: cover;
+                object-position: center 10%;
             }
             .char-name { font-size: 1.1em; }
             .char-job { font-size: 0.85em; margin-bottom: 4px; }
@@ -779,9 +794,10 @@
             .card {
                 width: 52px;
                 height: 72px;
-                font-size: 1.1em;
                 border-radius: 6px;
             }
+            .card-suit { font-size: 1.5em; }
+            .card-rank { font-size: 1.1em; }
             .cards { gap: 6px; }
 
             /* 下固定ボタンバー */
@@ -1081,11 +1097,11 @@
     <script>
         // キャラクターデータ（5人に絞る）
         const characters = [
-            { id: 1, name: "紅蓮", job: "遊女（花魁）", skill: "♥が3枚以上で役が1ランクアップ", hp: 100, skillType: "wildHearts", image: "./images/guren.jpg" },
-            { id: 5, name: "荒波 轟太郎", job: "力士", skill: "引き分けの時に勝ちになる", hp: 100, skillType: "drawWin", image: "./images/goutarou.jpg" },
-            { id: 9, name: "月影", job: "船頭", skill: "6枚から最良の5枚で戦う", hp: 100, skillType: "extraCard", image: "./images/tsukikage.jpg" },
-            { id: 16, name: "竜之介", job: "火消し", skill: "負けたラウンドを1度だけ無効化", hp: 100, skillType: "nullifyLoss", image: "./images/ryunosuke.jpg" },
-            { id: 19, name: "疾風", job: "飛脚", skill: "交換が3回できる", hp: 100, skillType: "threeExchange", image: "./images/hayate.jpg" }
+            { id: 1, name: "紅蓮", job: "遊女（花魁）", skill: "♥が3枚以上で役が1ランクアップ", skillName: "花街の色仕掛け", hp: 100, skillType: "wildHearts", image: "./images/guren.jpg", imageUp: "./images/guren_up.png" },
+            { id: 5, name: "荒波 轟太郎", job: "力士", skill: "引き分けの時に勝ちになる", skillName: "土俵際の巨浪", hp: 100, skillType: "drawWin", image: "./images/goutarou.jpg", imageUp: "./images/goutarou_up.png" },
+            { id: 9, name: "月影", job: "船頭", skill: "6枚から最良の5枚で戦う", skillName: "水無月の五月雨", hp: 100, skillType: "extraCard", image: "./images/tsukikage.jpg", imageUp: "./images/tsukikage_up.png" },
+            { id: 16, name: "竜之介", job: "火消し", skill: "負けたラウンドを1度だけ無効化", skillName: "赤竜の火焔", hp: 100, skillType: "nullifyLoss", image: "./images/ryunosuke.jpg", imageUp: "./images/ryunosuke_up.png" },
+            { id: 19, name: "疾風", job: "飛脚", skill: "交換が3回できる", skillName: "風神の夜半嵐", hp: 100, skillType: "threeExchange", image: "./images/hayate.jpg", imageUp: "./images/hayate_up.png" }
         ];
 
         let selectedCharacter = null;
@@ -1164,6 +1180,13 @@
                 body: `
                     <div style="display:flex; flex-direction:column; gap:0;">
                         <div style="border-bottom:1px solid rgba(212,165,116,0.15); padding:18px 0;">
+                            <div style="color:#d4a574; font-size:0.78em; letter-spacing:0.12em; margin-bottom:8px;">2026.03.10</div>
+                            <div style="color:#e8e0d0; line-height:1.8; margin-bottom:4px;">アップデートしました。</div>
+                            <div style="color:#aaa; font-size:0.9em; line-height:1.8;">・カードの視認性を改善しました</div>
+                            <div style="color:#aaa; font-size:0.9em; line-height:1.8;">・バトル画面のキャラクター画像をアップにしました</div>
+                            <div style="color:#aaa; font-size:0.9em; line-height:1.8;">・得意技名を追加しました</div>
+                        </div>
+                        <div style="border-bottom:1px solid rgba(212,165,116,0.15); padding:18px 0;">
                             <div style="color:#d4a574; font-size:0.78em; letter-spacing:0.12em; margin-bottom:8px;">2026.03.06</div>
                             <div style="color:#e8e0d0; line-height:1.8; margin-bottom:4px;">バグ、演出を修正しました。</div>
                             <div style="color:#e8e0d0; line-height:1.8;">サイトメニューを追加しました。</div>
@@ -1241,6 +1264,12 @@
                                 </div>
                             </div>
                         </div>
+                        <div style="margin-top:10px; padding:14px 16px; background:rgba(255,255,255,0.03); border:1px solid rgba(212,165,116,0.2); border-radius:8px;">
+                            <div style="color:#a08060; font-size:0.82em; line-height:1.9; text-align:center; letter-spacing:0.05em;">
+                                このゲームは個人制作のブラウザゲームです。<br>
+                                賭博・課金要素はありません。
+                            </div>
+                        </div>
                     </div>
                 `
             },
@@ -1252,7 +1281,8 @@
                             <img src="./images/guren.jpg" style="width:70px; height:98px; object-fit:cover; object-position:top; border-radius:8px; border:1px solid rgba(212,165,116,0.5); flex-shrink:0;">
                             <div>
                                 <div style="color:#ffd700; font-weight:bold; font-size:1.05em; font-family:'Hiragino Mincho ProN',serif; margin-bottom:3px;">紅蓮</div>
-                                <div style="color:#c9a870; font-size:0.82em; margin-bottom:8px;">遊女・花魁</div>
+                                <div style="color:#c9a870; font-size:0.82em; margin-bottom:4px;">遊女・花魁</div>
+                                <div style="color:#ffd700; font-size:0.8em; letter-spacing:0.1em; margin-bottom:6px;">⚔ 花街の色仕掛け</div>
                                 <div style="color:#e8e0d0; font-size:0.88em; line-height:1.7;">【特技】♥が3枚以上で役が1ランクアップ</div>
                             </div>
                         </div>
@@ -1260,7 +1290,8 @@
                             <img src="./images/goutarou.jpg" style="width:70px; height:98px; object-fit:cover; object-position:top; border-radius:8px; border:1px solid rgba(212,165,116,0.5); flex-shrink:0;">
                             <div>
                                 <div style="color:#ffd700; font-weight:bold; font-size:1.05em; font-family:'Hiragino Mincho ProN',serif; margin-bottom:3px;">荒波 轟太郎</div>
-                                <div style="color:#c9a870; font-size:0.82em; margin-bottom:8px;">力士</div>
+                                <div style="color:#c9a870; font-size:0.82em; margin-bottom:4px;">力士</div>
+                                <div style="color:#ffd700; font-size:0.8em; letter-spacing:0.1em; margin-bottom:6px;">⚔ 土俵際の巨浪</div>
                                 <div style="color:#e8e0d0; font-size:0.88em; line-height:1.7;">【特技】引き分けのとき必ず勝利</div>
                             </div>
                         </div>
@@ -1268,7 +1299,8 @@
                             <img src="./images/tsukikage.jpg" style="width:70px; height:98px; object-fit:cover; object-position:top; border-radius:8px; border:1px solid rgba(212,165,116,0.5); flex-shrink:0;">
                             <div>
                                 <div style="color:#ffd700; font-weight:bold; font-size:1.05em; font-family:'Hiragino Mincho ProN',serif; margin-bottom:3px;">月影</div>
-                                <div style="color:#c9a870; font-size:0.82em; margin-bottom:8px;">船頭</div>
+                                <div style="color:#c9a870; font-size:0.82em; margin-bottom:4px;">船頭</div>
+                                <div style="color:#ffd700; font-size:0.8em; letter-spacing:0.1em; margin-bottom:6px;">⚔ 水無月の五月雨</div>
                                 <div style="color:#e8e0d0; font-size:0.88em; line-height:1.7;">【特技】6枚配られ、最良の5枚で戦う</div>
                             </div>
                         </div>
@@ -1276,7 +1308,8 @@
                             <img src="./images/ryunosuke.jpg" style="width:70px; height:98px; object-fit:cover; object-position:top; border-radius:8px; border:1px solid rgba(212,165,116,0.5); flex-shrink:0;">
                             <div>
                                 <div style="color:#ffd700; font-weight:bold; font-size:1.05em; font-family:'Hiragino Mincho ProN',serif; margin-bottom:3px;">竜之介</div>
-                                <div style="color:#c9a870; font-size:0.82em; margin-bottom:8px;">火消し</div>
+                                <div style="color:#c9a870; font-size:0.82em; margin-bottom:4px;">火消し</div>
+                                <div style="color:#ffd700; font-size:0.8em; letter-spacing:0.1em; margin-bottom:6px;">⚔ 赤竜の火焔</div>
                                 <div style="color:#e8e0d0; font-size:0.88em; line-height:1.7;">【特技】負けたラウンドを1度だけ無効化</div>
                             </div>
                         </div>
@@ -1284,7 +1317,8 @@
                             <img src="./images/hayate.jpg" style="width:70px; height:98px; object-fit:cover; object-position:top; border-radius:8px; border:1px solid rgba(212,165,116,0.5); flex-shrink:0;">
                             <div>
                                 <div style="color:#ffd700; font-weight:bold; font-size:1.05em; font-family:'Hiragino Mincho ProN',serif; margin-bottom:3px;">疾風</div>
-                                <div style="color:#c9a870; font-size:0.82em; margin-bottom:8px;">飛脚</div>
+                                <div style="color:#c9a870; font-size:0.82em; margin-bottom:4px;">飛脚</div>
+                                <div style="color:#ffd700; font-size:0.8em; letter-spacing:0.1em; margin-bottom:6px;">⚔ 風神の夜半嵐</div>
                                 <div style="color:#e8e0d0; font-size:0.88em; line-height:1.7;">【特技】カード交換が3回できる</div>
                             </div>
                         </div>
@@ -1496,7 +1530,7 @@
                     <img src="${char.image}" class="character-image" alt="${char.name}">
                     <div class="character-name">${char.name}</div>
                     <div class="character-job">${char.job}</div>
-                    <div class="character-skill">【特技】${char.skill}</div>
+                    <div class="character-skill">【特技】<span style="color:#ffd700;">「${char.skillName}」</span><br>${char.skill}</div>
                 `;
                 // activeなカードをタップ→バトル開始、非activeはそちらへ移動
                 card.addEventListener('click', () => {
@@ -1613,7 +1647,7 @@
             const img = document.getElementById('enemyIntroImg');
             const name = document.getElementById('enemyIntroName');
 
-            img.src = character.image;
+            img.src = character.imageUp || character.image;
             name.textContent = character.name;
 
             overlay.style.display = 'flex';
@@ -1662,14 +1696,14 @@
             playBattleBgm();
 
             // キャラ情報表示
-            document.getElementById('playerImage').src = selectedCharacter.image;
+            document.getElementById('playerImage').src = selectedCharacter.imageUp || selectedCharacter.image;
             document.getElementById('playerName').textContent = selectedCharacter.name;
             document.getElementById('playerJob').textContent = selectedCharacter.job;
-            document.getElementById('playerSkill').textContent = `【特技】${selectedCharacter.skill}`;
-            document.getElementById('enemyImage').src = enemyCharacter.image;
+            document.getElementById('playerSkill').innerHTML = `【特技】<span style="color:#ffd700; font-size:0.95em;">「${selectedCharacter.skillName}」</span><br>${selectedCharacter.skill}`;
+            document.getElementById('enemyImage').src = enemyCharacter.imageUp || enemyCharacter.image;
             document.getElementById('enemyName').textContent = enemyCharacter.name;
             document.getElementById('enemyJob').textContent = enemyCharacter.job;
-            document.getElementById('enemySkill').textContent = `【特技】${enemyCharacter.skill}`;
+            document.getElementById('enemySkill').innerHTML = `【特技】<span style="color:#ffd700; font-size:0.95em;">「${enemyCharacter.skillName}」</span><br>${enemyCharacter.skill}`;
 
             // 星表示初期化
             updateStars();
@@ -1896,8 +1930,8 @@
             }
 
             cardEl.innerHTML = `
-                <div>${card.rank}</div>
                 <div class="card-suit">${card.suit}</div>
+                <div class="card-rank">${card.rank}</div>
             `;
             
             return cardEl;
@@ -2254,18 +2288,30 @@
             // battleLogからキー情報を抽出
             const logText = battleLog.join('\n');
 
-            // 能力発動テキスト抽出
-            const abilityLines = battleLog.filter(l =>
-                l.includes('【特技発動】') || l.includes('【相手特技発動】') ||
-                l.includes('ランクアップ') || l.includes('無効')
-            );
-
             // 役テキスト抽出
             const playerRoleLine = battleLog.find(l => l.startsWith('あなたの役:'));
             const enemyRoleLine = battleLog.find(l => l.startsWith('相手の役:'));
 
             // ラウンドタイトル
             const roundLine = battleLog.find(l => l.startsWith('--- ラウンド') || l.includes('VS'));
+
+            // 能力発動フラグ（skillTypeごとに正しく判定）
+            const playerAbilityFired = (() => {
+                switch (selectedCharacter.skillType) {
+                    case 'wildHearts':  return playerRoleLine && playerRoleLine.includes('ランクアップ');
+                    case 'drawWin':     return battleLog.some(l => l.includes('【特技発動】') && l.includes('引き分け'));
+                    case 'nullifyLoss': return battleLog.some(l => l.includes('【特技発動】') && l.includes('無効'));
+                    default:            return battleLog.some(l => l.includes('【特技発動】'));
+                }
+            })();
+            const enemyAbilityFired = (() => {
+                switch (enemyCharacter.skillType) {
+                    case 'wildHearts':  return battleLog.find(l => l.startsWith('相手の役:')) && battleLog.find(l => l.startsWith('相手の役:')).includes('ランクアップ');
+                    case 'drawWin':     return battleLog.some(l => l.includes('【相手特技発動】') && l.includes('引き分け'));
+                    case 'nullifyLoss': return battleLog.some(l => l.includes('【相手特技発動】') && l.includes('無効'));
+                    default:            return battleLog.some(l => l.includes('【相手特技発動】'));
+                }
+            })();
 
             // 構造化コンテンツ生成
             const sections = [];
@@ -2282,13 +2328,27 @@
             const abilitySection = document.createElement('div');
             abilitySection.style.cssText = 'background:rgba(255,215,0,0.08); border:1px solid rgba(255,215,0,0.3); border-radius:8px; padding:10px 14px; margin-bottom:10px;';
             abilitySection.innerHTML = `<div style="color:#ffd700; font-weight:bold; margin-bottom:6px; font-size:0.95em;">⚔ 能力発動</div>`;
-            if (abilityLines.length > 0) {
-                abilityLines.forEach(l => {
-                    const p = document.createElement('div');
-                    p.style.cssText = 'color:#ffe07a; font-size:0.9em; line-height:1.7;';
-                    p.textContent = l;
-                    abilitySection.appendChild(p);
-                });
+            if (playerAbilityFired || enemyAbilityFired) {
+                if (playerAbilityFired) {
+                    const nm = document.createElement('div');
+                    nm.style.cssText = 'color:#ffd700; font-size:0.9em; font-weight:bold; margin-bottom:2px;';
+                    nm.textContent = `「${selectedCharacter.skillName}」`;
+                    const sk = document.createElement('div');
+                    sk.style.cssText = 'color:#ffe07a; font-size:0.85em; line-height:1.6; margin-bottom:8px;';
+                    sk.textContent = selectedCharacter.skill;
+                    abilitySection.appendChild(nm);
+                    abilitySection.appendChild(sk);
+                }
+                if (enemyAbilityFired) {
+                    const nm = document.createElement('div');
+                    nm.style.cssText = 'color:#ffaa44; font-size:0.9em; font-weight:bold; margin-bottom:2px;';
+                    nm.textContent = `「${enemyCharacter.skillName}」（相手）`;
+                    const sk = document.createElement('div');
+                    sk.style.cssText = 'color:#ffcc88; font-size:0.85em; line-height:1.6;';
+                    sk.textContent = enemyCharacter.skill;
+                    abilitySection.appendChild(nm);
+                    abilitySection.appendChild(sk);
+                }
             } else {
                 const p = document.createElement('div');
                 p.style.cssText = 'color:#888; font-size:0.85em;';
@@ -2387,10 +2447,10 @@
             roundCount = 0;
             playerNullifyUsed = false;
             enemyNullifyUsed = false;
-            document.getElementById('enemyImage').src = enemyCharacter.image;
+            document.getElementById('enemyImage').src = enemyCharacter.imageUp || enemyCharacter.image;
             document.getElementById('enemyName').textContent = enemyCharacter.name;
             document.getElementById('enemyJob').textContent = enemyCharacter.job;
-            document.getElementById('enemySkill').textContent = `【特技】${enemyCharacter.skill}`;
+            document.getElementById('enemySkill').innerHTML = `【特技】<span style="color:#ffd700; font-size:0.95em;">「${enemyCharacter.skillName}」</span><br>${enemyCharacter.skill}`;
 
             // 星表示初期化
             updateStars();
