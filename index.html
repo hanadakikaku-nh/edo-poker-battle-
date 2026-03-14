@@ -1680,6 +1680,19 @@
         function startBattle() {
             if (!selectedCharacter) return;
 
+            // GA4: ゲーム開始イベント
+            gtag('event', 'game_start', {
+                character_name: selectedCharacter.name,
+                character_id: selectedCharacter.id
+            });
+
+            // GA4: キャラクター選択イベント
+            gtag('event', 'character_select', {
+                character_name: selectedCharacter.name,
+                character_id: selectedCharacter.id,
+                character_job: selectedCharacter.job
+            });
+
             // ランダムに敵を選択
             const availableEnemies = characters.filter(c => c.id !== selectedCharacter.id);
             enemyCharacter = availableEnemies[Math.floor(Math.random() * availableEnemies.length)];
@@ -2403,6 +2416,13 @@
 
             // 勝敗結果
             if (isWin === true) {
+                // GA4: 勝利イベント
+                gtag('event', 'battle_result', {
+                    result: 'win',
+                    character_name: selectedCharacter.name,
+                    enemy_name: enemyCharacter.name,
+                    round_count: roundCount
+                });
                 const resultDiv = document.createElement('div');
                 resultDiv.className = 'result-text win';
                 resultDiv.textContent = '🎉 勝利！ 🎉';
@@ -2410,6 +2430,13 @@
                 document.getElementById('popupButton').textContent = '次の対戦相手へ';
                 document.getElementById('popupButton').onclick = nextBattle;
             } else if (isWin === false) {
+                // GA4: 敗北イベント
+                gtag('event', 'battle_result', {
+                    result: 'lose',
+                    character_name: selectedCharacter.name,
+                    enemy_name: enemyCharacter.name,
+                    round_count: roundCount
+                });
                 const resultDiv = document.createElement('div');
                 resultDiv.className = 'result-text lose';
                 resultDiv.textContent = '💀 敗北... 💀';
@@ -2417,6 +2444,13 @@
                 document.getElementById('popupButton').textContent = '次の対戦相手へ';
                 document.getElementById('popupButton').onclick = nextBattle;
             } else if (isWin === 'draw') {
+                // GA4: 引き分けイベント
+                gtag('event', 'battle_result', {
+                    result: 'draw',
+                    character_name: selectedCharacter.name,
+                    enemy_name: enemyCharacter.name,
+                    round_count: roundCount
+                });
                 const resultDiv = document.createElement('div');
                 resultDiv.className = 'result-text';
                 resultDiv.textContent = '⚔️ 引き分け ⚔️';
@@ -2434,7 +2468,13 @@
         // 次の対戦へ（同じキャラを使用）
         function nextBattle() {
             document.getElementById('popupOverlay').classList.remove('show');
-            
+
+            // GA4: 続けてプレイイベント
+            gtag('event', 'continue_game', {
+                character_name: selectedCharacter.name,
+                character_id: selectedCharacter.id
+            });
+
             // 同じキャラで新しい対戦相手を選ぶ（前回と同じ相手にならないようにする）
             const availableEnemies = characters.filter(c => c.id !== selectedCharacter.id && c.id !== enemyCharacter.id);
             // availableEnemiesが空の場合（キャラが2人しかいない場合）は全員から選ぶ
