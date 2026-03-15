@@ -1737,6 +1737,7 @@
             let touchStartY = 0;
             let isSwiping = false;
             let _suppressClick = false;
+            let isAnimating = false;
             carousel.addEventListener('touchstart', (e) => {
                 touchStartX = e.touches[0].clientX;
                 touchStartY = e.touches[0].clientY;
@@ -1841,6 +1842,8 @@
 
         // 前のキャラ
         function prevCharacter() {
+            if (isAnimating) return;
+            isAnimating = true;
             const list = document.getElementById('characterList');
             const cardWidth = getCardWidth();
 
@@ -1856,16 +1859,20 @@
                 setTimeout(() => {
                     currentCharacterIndex = characters.length - 1;
                     updateCarousel(false);
+                    isAnimating = false;
                 }, 520);
             } else {
                 currentCharacterIndex--;
                 list.style.transition = 'transform 0.5s ease';
                 updateCarousel(true);
+                setTimeout(() => { isAnimating = false; }, 520);
             }
         }
 
         // 次のキャラ
         function nextCharacter() {
+            if (isAnimating) return;
+            isAnimating = true;
             const list = document.getElementById('characterList');
             const cardWidth = getCardWidth();
             const lastIndex = characters.length - 1;
@@ -1883,11 +1890,13 @@
                 setTimeout(() => {
                     currentCharacterIndex = 0;
                     updateCarousel(false);
+                    isAnimating = false;
                 }, 520);
             } else {
                 currentCharacterIndex++;
                 list.style.transition = 'transform 0.5s ease';
                 updateCarousel(true);
+                setTimeout(() => { isAnimating = false; }, 520);
             }
         }
 
