@@ -1731,39 +1731,8 @@
             runIntro();
             document.body.addEventListener('click', () => { playSelectBgm(); }, { once: true });
 
-            // フリック（スワイプ）対応
-            const carousel = document.querySelector('.character-carousel');
-            let touchStartX = 0;
-            let touchStartY = 0;
-            let isSwiping = false;
             let _suppressClick = false;
             let isAnimating = false;
-            carousel.addEventListener('touchstart', (e) => {
-                touchStartX = e.touches[0].clientX;
-                touchStartY = e.touches[0].clientY;
-                isSwiping = false;
-            }, { passive: true });
-            carousel.addEventListener('touchmove', (e) => {
-                const dx = e.touches[0].clientX - touchStartX;
-                const dy = e.touches[0].clientY - touchStartY;
-                if (!isSwiping && Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 8) {
-                    isSwiping = true;
-                }
-            }, { passive: true });
-            carousel.addEventListener('touchend', (e) => {
-                if (!isSwiping) return;
-                const dx = e.changedTouches[0].clientX - touchStartX;
-                if (dx < -40) {
-                    playSound('se_btm');
-                    nextCharacter();
-                    _suppressClick = true;
-                } else if (dx > 40) {
-                    playSound('se_btm');
-                    prevCharacter();
-                    _suppressClick = true;
-                }
-                isSwiping = false;
-            }, { passive: true });
         }
 
         // キャラ選択画面を描画（無限ループカルーセル）
