@@ -1303,6 +1303,8 @@
 
         // 初期化
         let currentCharacterIndex = 0;
+        let _suppressClick = false;
+        let isAnimating = false;
 
         // ドロワーメニュー
         function openDrawer() {
@@ -1730,9 +1732,6 @@
             document.documentElement.style.setProperty('--img-max-h', imgMaxH + 'px');
             runIntro();
             document.body.addEventListener('click', () => { playSelectBgm(); }, { once: true });
-
-            let _suppressClick = false;
-            let isAnimating = false;
         }
 
         // キャラ選択画面を描画（無限ループカルーセル）
@@ -1757,18 +1756,12 @@
                     <div class="character-job">${char.job}</div>
                     <div class="character-skill">【特技】<span style="color:#ffd700;">「${char.skillName}」</span><br>${char.skill}</div>
                 `;
-                // activeなカードをタップ→バトル開始、非activeはそちらへ移動
+                // activeなカードをタップ→バトル開始のみ
                 card.addEventListener('click', () => {
-                    if (_suppressClick) { _suppressClick = false; return; }
                     const realIndex = currentCharacterIndex + 1;
                     if (index === realIndex) {
-                        // 選択中のカード → バトル開始
                         playSound('se_btlstart');
                         startBattle();
-                    } else if (index < realIndex) {
-                        prevCharacter();
-                    } else {
-                        nextCharacter();
                     }
                 });
                 list.appendChild(card);
