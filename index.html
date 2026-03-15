@@ -1736,6 +1736,7 @@
             let touchStartX = 0;
             let touchStartY = 0;
             let isSwiping = false;
+            let _suppressClick = false;
             carousel.addEventListener('touchstart', (e) => {
                 touchStartX = e.touches[0].clientX;
                 touchStartY = e.touches[0].clientY;
@@ -1754,9 +1755,11 @@
                 if (dx < -40) {
                     playSound('se_btm');
                     nextCharacter();
+                    _suppressClick = true;
                 } else if (dx > 40) {
                     playSound('se_btm');
                     prevCharacter();
+                    _suppressClick = true;
                 }
                 isSwiping = false;
             }, { passive: true });
@@ -1786,6 +1789,7 @@
                 `;
                 // activeなカードをタップ→バトル開始、非activeはそちらへ移動
                 card.addEventListener('click', () => {
+                    if (_suppressClick) { _suppressClick = false; return; }
                     const realIndex = currentCharacterIndex + 1;
                     if (index === realIndex) {
                         // 選択中のカード → バトル開始
