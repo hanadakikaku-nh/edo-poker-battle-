@@ -1545,11 +1545,35 @@
             document.getElementById('menuScreen').style.display = 'none';
         }
 
-        // SE再生後にBGMを再開する対象を管理
-        let _bgmResumeTarget = null;
+        // BGMダッキング管理（SEが鳴っている間BGMを小さくする）
+        let _duckingCount = 0;         // 現在再生中のSE数
+        let _duckTimer = null;         // 音量復元タイマー
+        const BGM_NORMAL_VOL = bgmVolume;  // 通常音量
+        const BGM_DUCK_VOL   = 0.07;       // SE中の音量
 
-        // 現在再生中のSE要素を管理
-        const _playingSEs = new Set();
+        function _getBgms() {
+            return [
+                document.getElementById('selectBgm'),
+                document.getElementById('battleBgm')
+            ];
+        }
+
+        function _duckBgm() {
+            if (_duckTimer) { clearTimeout(_duckTimer); _duckTimer = null; }
+            _duckingCount++;
+            _getBgms().forEach(b => { if (b) b.volume = BGM_DUCK_VOL; });
+        }
+
+        function _unduckBgm() {
+            _duckingCount = Math.max(0, _duckingCount - 1);
+            if (_duckingCount === 0) {
+                // 少し間を置いてから音量を戻す
+                _duckTimer = setTimeout(() => {
+                    _getBgms().forEach(b => { if (b) b.volume = BGM_NORMAL_VOL; });
+                    _duckTimer = null;
+                }, 150);
+            }
+        }
 
         function playSound(id) {
             if (!bgmEnabled) return;
@@ -1557,31 +1581,12 @@
             if (!el) return;
             el.currentTime = 0;
 
-            // se_btm以外はBGMを一時停止してSE終了後に再開
             if (id !== 'se_btm') {
-                const selectBgm = document.getElementById('selectBgm');
-                const battleBgm = document.getElementById('battleBgm');
-                const activeBgm = !selectBgm.paused ? selectBgm : (!battleBgm.paused ? battleBgm : null);
-
-                // BGMが流れていれば止めて再開対象を記録（上書きしない）
-                if (activeBgm && bgmEnabled) {
-                    activeBgm.pause();
-                    _bgmResumeTarget = activeBgm;
-                }
-
-                const alreadyPlaying = _playingSEs.has(el);
-                _playingSEs.add(el);
+                _duckBgm();
                 el.play().catch(() => {});
-                if (!alreadyPlaying) {
-                    el.addEventListener('ended', () => {
-                        _playingSEs.delete(el);
-                        // 全SEが終わった時だけBGMを再開
-                        if (_playingSEs.size === 0 && _bgmResumeTarget && _bgmResumeTarget.paused && bgmEnabled) {
-                            _bgmResumeTarget.play().catch(() => {});
-                            _bgmResumeTarget = null;
-                        }
-                    }, { once: true });
-                }
+                el.addEventListener('ended', () => {
+                    _unduckBgm();
+                }, { once: true });
                 return;
             }
 
@@ -2011,7 +2016,6 @@
             const seEl = document.getElementById('se_btlstart');
             if (seEl) {
                 seEl.addEventListener('ended', () => {
-                    _bgmResumeTarget = null;
                     playBattleBgm();
                 }, { once: true });
             } else {
@@ -2626,13 +2630,6 @@
 
             // ポップアップ表示
             if (gameOver) {
-                // 勝利・敗北時はse_starを止めてse_win/se_loseだけ鳴らす
-                const starEl = document.getElementById('se_star');
-                if (starEl && !starEl.paused) {
-                    starEl.pause();
-                    starEl.currentTime = 0;
-                    _playingSEs.delete(starEl);
-                }
                 if (finalWinner === 'player') {
                     showPopup(true);
                 } else if (finalWinner === 'enemy') {
@@ -2681,13 +2678,6 @@
 
         // ポップアップ表示
         function showPopup(isWin) {
-            // 途中ラウンド（isWin === null）はSE終了を待たずBGMを即再開
-            if (isWin === null) {
-                if (_bgmResumeTarget && _bgmResumeTarget.paused && bgmEnabled) {
-                    _bgmResumeTarget.play().catch(() => {});
-                }
-                _bgmResumeTarget = null;
-            }
 
             const popupContent = document.getElementById('popupContent');
             popupContent.innerHTML = '';
@@ -2974,7 +2964,6 @@
             const seEl = document.getElementById('se_change');
             if (seEl && !seEl.paused) {
                 seEl.addEventListener('ended', () => {
-                    _bgmResumeTarget = null;
                     playSelectBgm();
                 }, { once: true });
             } else {
