@@ -1589,10 +1589,20 @@
             }
         }
 
+        // SE別に直前のcloneを保持（止めてから再生するため）
+        const _seClones = {};
+
         function _playSE(el) {
-            // スマホ対応：cloneNodeで毎回新しい要素として再生
+            const id = el.id;
+            // 前回のcloneが残っていれば止める
+            if (_seClones[id]) {
+                _seClones[id].pause();
+                _seClones[id].src = '';
+                _seClones[id] = null;
+            }
             const clone = el.cloneNode();
             clone.volume = 1.0;
+            _seClones[id] = clone;
             clone.play().catch(() => {});
             return clone;
         }
