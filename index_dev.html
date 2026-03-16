@@ -2990,15 +2990,7 @@
             document.getElementById('battleScreen').classList.remove('active');
             document.getElementById('characterSelectScreen').style.display = 'flex';
             syncMobileBar();
-            // se_changeのSE終了後にセレクトBGMを再開
-            const seEl = document.getElementById('se_change');
-            if (seEl) {
-                seEl.addEventListener('ended', () => {
-                    playSelectBgm();
-                }, { once: true });
-            } else {
-                playSelectBgm();
-            }
+            // se_change再生→終了後にselectBgm自動再開（playSound内で処理済み）
             // 選んでいたキャラの一言を表示
             if (selectedCharacter) {
                 setTimeout(() => showQuote(selectedCharacter), 300);
