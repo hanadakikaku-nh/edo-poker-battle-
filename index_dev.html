@@ -2931,6 +2931,7 @@
             addLog('');
 
             // 敵登場アニメーション → 最初のラウンド開始
+            playBattleBgm();
             showEnemyIntro(enemyCharacter, () => setTimeout(() => startRound(), 500));
         }
 
