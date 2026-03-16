@@ -1,0 +1,2961 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>江戸戯掛 札戦</title>
+    <!-- Google Analytics -->
+    <!-- TODO: 下記の GA_MEASUREMENT_ID をトラッキングIDに差し替えてください -->
+    <!-- 例: G-XXXXXXXXXX -->
+  
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-6C0TEE5JWB"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-6C0TEE5JWB');
+    </script>
+  
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Hiragino Sans', 'Noto Sans JP', sans-serif;
+            background: linear-gradient(to bottom, #2c1810, #1a0f0a);
+            min-height: 100vh;
+            color: #fff;
+        }
+
+        .container {
+            max-width: 100%;
+            min-height: 100vh;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            text-align: center;
+            padding: 8px 15px;
+            background: rgba(0,0,0,0.3);
+            position: relative;
+        }
+
+        h1 {
+            font-size: 2em;
+            color: #d4a574;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+            font-family: 'Hiragino Mincho ProN', 'Yu Mincho', 'MS Mincho', serif;
+            letter-spacing: 0.05em;
+        }
+
+        /* キャラ選択画面 */
+        #characterSelectScreen {
+            padding: 10px 20px 30px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            min-height: calc(100vh - 68px);
+        }
+
+        .select-title {
+            font-size: 1em;
+            color: #d4a574;
+            margin-bottom: 0;
+            text-align: center;
+            font-family: 'Hiragino Mincho ProN', 'Yu Mincho', 'MS Mincho', serif;
+            flex-shrink: 0;
+            letter-spacing: 0.05em;
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            white-space: nowrap;
+        }
+
+        .select-title-row {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            width: 100%;
+            padding: 0 4px;
+            margin-bottom: 8px;
+            flex-shrink: 0;
+            position: relative;
+            z-index: 1;
+            height: 2em;
+        }
+
+        .character-carousel {
+            position: relative;
+            width: 100%;
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: visible;
+            min-height: 0;
+            z-index: 0;
+        }
+
+        .character-select {
+            display: flex;
+            transition: transform 0.5s ease;
+            gap: 30px;
+            align-items: flex-start;
+        }
+
+        .character-card {
+            background: linear-gradient(to bottom, #3a2415, #2a1a10);
+            border: 3px solid #d4a574;
+            border-radius: 15px;
+            padding: 15px 20px;
+            text-align: center;
+            width: 50vw;
+            max-width: 340px;
+            transition: all 0.5s;
+            opacity: 0.35;
+            flex-shrink: 0;
+            position: relative;
+            box-sizing: border-box;
+        }
+
+        .character-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-size: cover;
+            background-position: center;
+            opacity: 0.3;
+            z-index: 0;
+        }
+
+        .character-card > * {
+            position: relative;
+            z-index: 1;
+        }
+
+        .character-image {
+            width: 100%;
+            max-width: 240px;
+            height: 340px;
+            max-height: 500px;
+            min-height: 200px;
+            object-fit: cover;
+            object-position: center top;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            border: 2px solid #d4a574;
+            background: rgba(0,0,0,0.3);
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .character-card.active {
+            opacity: 1;
+            border-color: #ffd700;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.6);
+            cursor: pointer;
+        }
+
+        .character-name {
+            font-size: 2em;
+            color: #ffd700;
+            margin-bottom: 6px;
+            font-weight: bold;
+            font-family: 'Hiragino Mincho ProN', 'Yu Mincho', 'MS Mincho', serif;
+        }
+
+        .character-job {
+            font-size: 1.2em;
+            color: #c9a870;
+            margin-bottom: 8px;
+        }
+
+        .character-skill {
+            font-size: 0.95em;
+            color: #aaa;
+            margin-top: 8px;
+            padding-top: 8px;
+            border-top: 1px solid #555;
+            line-height: 1.6;
+        }
+
+        .carousel-button {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(212, 165, 116, 0.7);
+            border: 2px solid #d4a574;
+            color: white;
+            font-size: 1.5em;
+            width: 60px;
+            height: 60px;
+            min-width: 60px;
+            min-height: 60px;
+            border-radius: 50%;
+            cursor: pointer;
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+            padding: 0;
+            margin: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+            font-weight: bold;
+        }
+
+        .carousel-button:hover {
+            background: rgba(212, 165, 116, 1);
+            transform: translateY(-50%) scale(1.1);
+        }
+
+        .carousel-button.left { left: 20px; }
+        .carousel-button.right { right: 20px; }
+
+        .start-button-area {
+            text-align: center;
+            margin-top: 20px;
+            margin-bottom: 8px;
+            flex-shrink: 0;
+            padding-top: 16px;
+            border-top: 1px solid rgba(212,165,116,0.2);
+            width: 100%;
+            max-width: 340px;
+        }
+
+        .start-button-area button {
+            padding: 14px 36px;
+            font-size: 1.1em;
+            min-width: 140px;
+        }
+
+        /* バトル画面 */
+        .battle-screen {
+            display: none;
+            height: calc(100vh - 80px);
+            grid-template-columns: 1fr auto 1fr;
+            gap: 20px;
+            padding: 20px;
+        }
+
+        .battle-screen.active { display: grid; }
+
+        /* 左右のキャラエリア */
+        .player-area, .enemy-area {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .character-info {
+            background: rgba(58, 36, 21, 0.9);
+            border: 3px solid #d4a574;
+            border-radius: 10px;
+            padding: 15px;
+            display: flex;
+            gap: 15px;
+            align-items: flex-start;
+        }
+
+        .character-info-image {
+            width: 110px;
+            height: 130px;
+            object-fit: cover;
+            object-position: center 10%;
+            border-radius: 8px;
+            border: 2px solid #d4a574;
+            flex-shrink: 0;
+            background: rgba(0,0,0,0.3);
+        }
+
+        .character-info-text {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .char-name {
+            font-size: 1.5em;
+            color: #ffd700;
+            margin-bottom: 5px;
+            font-weight: bold;
+            font-family: 'Hiragino Mincho ProN', 'Yu Mincho', 'MS Mincho', serif;
+        }
+
+        .char-job {
+            font-size: 1em;
+            color: #c9a870;
+            margin-bottom: 10px;
+        }
+
+        .stars {
+            font-size: 2.4em;
+            margin: 8px 0;
+            min-height: auto;
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .star { color: #ffd700; }
+        .star.empty { color: #555; }
+
+        .char-skill {
+            font-size: 0.8em;
+            color: #c9a870;
+            line-height: 1.5;
+            margin-top: 10px;
+        }
+
+        /* 手札エリア */
+        .hand-area {
+            flex: 1;
+            background: rgba(26, 15, 10, 0.9);
+            border: 3px solid #d4a574;
+            border-radius: 10px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .hand-label {
+            font-size: 1.2em;
+            color: #ffd700;
+            margin-bottom: 15px;
+        }
+
+        .cards {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .card {
+            width: 70px;
+            height: 95px;
+            background: #fff;
+            border: 2px solid #555;
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .card:hover { transform: translateY(-10px); }
+
+        .card.selected {
+            border-color: #d4a574;
+            transform: translateY(-15px);
+            box-shadow: 0 8px 16px rgba(0,0,0,0.5);
+        }
+
+        .card.red { color: #cc0000; }
+        .card.black { color: #111; }
+
+        .card-suit { font-size: 1.8em; line-height: 1; }
+        .card-rank  { font-size: 1.3em; font-weight: 900; line-height: 1; }
+
+        .card-back {
+            background: #080808;
+            border-color: #8a7040;
+            cursor: default;
+            padding: 0;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .card-back:hover { transform: none; }
+
+        .card-back svg {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0; left: 0;
+        }
+
+        /* 中央エリア */
+        .center-area {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 30px;
+            min-width: 200px;
+        }
+
+        .vs-text {
+            font-size: 4em;
+            color: #ffd700;
+            font-weight: bold;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+        }
+
+        .exchange-count {
+            font-size: 1.1em;
+            color: #c9a870;
+            text-align: center;
+        }
+
+        button {
+            background: linear-gradient(to bottom, #d4a574, #b8935c);
+            color: white;
+            border: none;
+            padding: 20px 40px;
+            font-size: 1.3em;
+            border-radius: 10px;
+            cursor: pointer;
+            font-family: inherit;
+            font-weight: bold;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+            transition: all 0.3s;
+            min-width: 180px;
+        }
+
+        button:hover:not(:disabled) {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 14px rgba(0,0,0,0.6);
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        button.danger {
+            background: linear-gradient(to bottom, #c41e3a, #a01828);
+        }
+
+        /* ポップアップ */
+        .popup-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .popup-overlay.show { display: flex; }
+
+        .popup {
+            background: linear-gradient(to bottom, #3a2415, #2a1a10);
+            border: 3px solid #d4a574;
+            border-radius: 15px;
+            padding: 30px;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 0 40px rgba(0,0,0,0.8);
+        }
+
+        .popup-title {
+            font-size: 1.8em;
+            color: #ffd700;
+            text-align: center;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+
+        .popup-content {
+            font-size: 1.1em;
+            line-height: 2;
+            color: #fff;
+        }
+
+        .popup-message { margin: 8px 0; }
+
+        .result-text {
+            font-size: 2em;
+            text-align: center;
+            margin: 20px 0;
+            font-weight: bold;
+        }
+
+        .result-text.win {
+            color: #ffd700;
+        }
+
+        .result-text.lose {
+            color: #ff6666;
+        }
+
+        .popup-button {
+            text-align: center;
+            margin-top: 25px;
+        }
+
+        .hidden {
+            display: none;
+        }
+    </style>
+    <style>
+        /* ===== オープニング演出 ===== */
+        #introScreen {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: #000;
+            z-index: 9999;
+            overflow: hidden;
+        }
+
+        /* クローズアップシーン */
+        #introCloseup {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .closeup-slide {
+            position: absolute;
+            inset: 0;
+            opacity: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .closeup-slide img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: top center;
+            filter: sepia(0.3) contrast(1.15) brightness(0.85);
+            transform: scale(1.1);
+        }
+
+        /* 名前テキスト */
+        .closeup-name {
+            position: absolute;
+            bottom: 80px;
+            left: 0; right: 0;
+            text-align: center;
+            font-family: 'Hiragino Mincho ProN', 'Yu Mincho', serif;
+            color: #f0d090;
+            font-size: 2em;
+            letter-spacing: 0.3em;
+            opacity: 0;
+            text-shadow: 2px 2px 8px rgba(0,0,0,0.9), 0 0 30px rgba(212,165,116,0.3);
+        }
+
+        .closeup-job {
+            position: absolute;
+            bottom: 55px;
+            left: 0; right: 0;
+            text-align: center;
+            font-family: 'Hiragino Mincho ProN', 'Yu Mincho', serif;
+            color: #a08060;
+            font-size: 0.95em;
+            letter-spacing: 0.2em;
+            opacity: 0;
+        }
+
+        /* 横線フラッシュ */
+        .closeup-line {
+            position: absolute;
+            left: 0; right: 0;
+            height: 1px;
+            background: linear-gradient(to right, transparent, #d4a574, #fff8e0, #d4a574, transparent);
+            opacity: 0;
+        }
+        .closeup-line-top { top: 18%; }
+        .closeup-line-bottom { bottom: 18%; }
+
+        /* 全員集合シーン */
+        #introAllScene {
+            position: absolute;
+            inset: 0;
+            opacity: 0;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            background: radial-gradient(ellipse at 50% 80%, #1a0800 0%, #000 70%);
+        }
+
+        .all-chara {
+            position: absolute;
+            bottom: 0;
+            object-fit: cover;
+            object-position: top center;
+            filter: sepia(0.25) contrast(1.1);
+            opacity: 0;
+            transform: translateY(30px);
+        }
+
+        /* ロゴシーン */
+        #introLogo {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            opacity: 0;
+            z-index: 10;
+            background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.5) 50%, transparent 100%);
+            padding-bottom: 40px;
+            padding-top: 120px;
+        }
+        #introLogo img {
+            height: 110px;
+            object-fit: contain;
+            filter: drop-shadow(0 0 30px rgba(212,165,116,0.9)) drop-shadow(0 4px 12px rgba(0,0,0,0.9));
+        }
+
+        /* シネマバー */
+        .intro-bar {
+            position: absolute;
+            left: 0; right: 0;
+            background: #000;
+            z-index: 5;
+            height: 70px;
+        }
+        .intro-bar-top { top: 0; }
+        .intro-bar-bottom { bottom: 0; }
+
+        /* スキップ */
+        .intro-skip {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            color: rgba(212,165,116,0.5);
+            font-size: 0.75em;
+            z-index: 20;
+            letter-spacing: 0.1em;
+            cursor: pointer;
+        }
+
+        /* ===== 難易度選択画面 ===== */
+        #difficultyScreen {
+            position: fixed;
+            inset: 0;
+            background: linear-gradient(to bottom, #2c1810, #1a0f0a);
+            z-index: 500;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 24px;
+            padding: 40px 20px;
+        }
+        #difficultyScreen.show { display: flex; }
+        .diff-title {
+            font-family: 'Hiragino Mincho ProN', 'Yu Mincho', serif;
+            color: #d4a574;
+            font-size: 1.1em;
+            letter-spacing: 0.25em;
+            margin-bottom: 8px;
+        }
+        .diff-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            width: 100%;
+            max-width: 320px;
+        }
+        .diff-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            padding: 16px 24px;
+            border-radius: 12px;
+            border: 2px solid rgba(212,165,116,0.4);
+            background: rgba(58,36,21,0.8);
+            cursor: pointer;
+            transition: all 0.25s;
+            min-width: auto;
+            box-shadow: none;
+            text-align: left;
+        }
+        .diff-btn:hover:not(:disabled) {
+            border-color: #ffd700;
+            background: rgba(80,50,25,0.9);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(0,0,0,0.5);
+        }
+        .diff-btn-name {
+            font-size: 1.6em;
+            font-weight: bold;
+            color: #ffd700;
+            font-family: 'Hiragino Mincho ProN', 'Yu Mincho', serif;
+            letter-spacing: 0.05em;
+            margin-bottom: 4px;
+            display: flex;
+            align-items: baseline;
+            gap: 8px;
+        }
+        .diff-btn-level {
+            font-size: 0.48em;
+            color: #c9a870;
+            font-weight: normal;
+            letter-spacing: 0.08em;
+        }
+        .diff-btn-desc {
+            font-size: 0.68em;
+            font-weight: normal;
+            color: #fff;
+            letter-spacing: 0.05em;
+            line-height: 1.5;
+        }
+
+    </style>
+    <style>
+        /* ===== ドロワーメニュー ===== */
+        .drawer-item {
+            display: block;
+            width: 100%;
+            text-align: left;
+            background: transparent;
+            border: none;
+            border-bottom: 1px solid rgba(212,165,116,0.1);
+            color: #e8d8c0;
+            font-size: 0.95em;
+            padding: 16px 24px;
+            min-width: auto;
+            box-shadow: none;
+            border-radius: 0;
+            letter-spacing: 0.1em;
+            font-family: 'Hiragino Mincho ProN', 'Yu Mincho', serif;
+            transition: background 0.2s, color 0.2s;
+            cursor: pointer;
+        }
+        .drawer-item:hover {
+            background: rgba(212,165,116,0.12);
+            color: #ffd700;
+            transform: none;
+        }
+
+        /* メニューパネル（モーダル） */
+        .menu-panel-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.8);
+            z-index: 900;
+            align-items: center;
+            justify-content: center;
+        }
+        .menu-panel-overlay.show { display: flex; }
+        .menu-panel {
+            background: linear-gradient(to bottom, #3a2415, #2a1a10);
+            border: 2px solid rgba(212,165,116,0.5);
+            border-radius: 14px;
+            padding: 28px 28px 24px;
+            max-width: 520px;
+            width: 90vw;
+            max-height: 82vh;
+            overflow-y: auto;
+            box-shadow: 0 0 40px rgba(0,0,0,0.8);
+        }
+        .menu-panel-title {
+            font-size: 1.2em;
+            color: #ffd700;
+            letter-spacing: 0.25em;
+            font-family: 'Hiragino Mincho ProN','Yu Mincho',serif;
+            margin-bottom: 18px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(212,165,116,0.3);
+        }
+        .menu-panel-body {
+            color: #ccc;
+            font-size: 0.92em;
+            line-height: 1.9;
+        }
+
+        /* ===== スマホ対応 ===== */
+        @media (max-width: 600px) {
+
+            /* ヘッダー */
+            h1 { font-size: 1.3em; }
+
+            /* キャラ選択 */
+            #characterSelectScreen {
+                padding: 8px 10px 30px;
+                min-height: calc(100vh - 56px);
+            }
+            .select-title {
+                font-size: 0.85em;
+                margin-bottom: 2px;
+                position: static;
+                transform: none;
+                white-space: normal;
+            }
+            .select-title-row {
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                gap: 4px;
+                margin-bottom: 8px;
+                height: auto;
+            }
+
+            .character-card {
+                width: 78vw;
+                max-width: 320px;
+                padding: 10px 14px;
+            }
+            .character-image {
+                height: 260px;
+                min-height: 160px;
+            }
+            .character-name { font-size: 1.5em; }
+            .character-job { font-size: 1em; }
+            .character-skill { font-size: 0.85em; }
+
+            .carousel-button {
+                width: 44px;
+                height: 44px;
+                min-width: 44px;
+                min-height: 44px;
+                font-size: 1.1em;
+            }
+            .carousel-button.left { left: 4px; }
+            .carousel-button.right { right: 4px; }
+
+            .start-button-area button {
+                padding: 12px 28px;
+                font-size: 1em;
+                min-width: 120px;
+            }
+
+            /* バトル画面：縦スクロール、ボタンは画面下固定 */
+            .battle-screen {
+                display: none;
+                height: auto;
+                min-height: calc(100vh - 56px);
+                grid-template-columns: 1fr;
+                grid-template-rows: auto auto auto;
+                gap: 8px;
+                padding: 8px;
+                padding-bottom: calc(110px + env(safe-area-inset-bottom)); /* 下固定ボタン＋セーフエリア分の余白 */
+                overflow-y: auto;
+            }
+            .battle-screen.active { display: grid; }
+
+            /* 敵エリアを上に */
+            .enemy-area { order: -1; }
+            .center-area { order: 0; display: none; } /* 中央エリアは非表示 */
+            .player-area { order: 1; }
+
+            /* 敵キャラ：名前・職業・星・スキルを一列コンパクト */
+            .enemy-area .character-info {
+                padding: 6px 12px;
+                gap: 8px;
+                align-items: center;
+                border-width: 1px;
+                flex-wrap: wrap;
+            }
+            .enemy-area .character-info-image { display: none; }
+            .enemy-area .character-info-text {
+                flex-direction: row;
+                flex-wrap: wrap;
+                align-items: center;
+                gap: 6px;
+            }
+            .enemy-area .char-name { font-size: 0.9em; margin-bottom: 0; }
+            .enemy-area .char-job { font-size: 0.78em; margin-bottom: 0; }
+            .enemy-area .stars { font-size: 1.3em; margin: 0; }
+            .enemy-area .char-skill { font-size: 0.7em; margin-top: 0; line-height: 1.4; width: 100%; }
+            .enemy-area .hand-area { padding: 8px 10px; border-width: 1px; }
+            .enemy-area .hand-label { font-size: 0.85em; margin-bottom: 6px; }
+
+            /* 自分キャラ */
+            .player-area .character-info {
+                padding: 8px 10px;
+                gap: 10px;
+            }
+            .player-area .character-info-image {
+                width: 64px;
+                height: 88px;
+                object-fit: cover;
+                object-position: center 10%;
+            }
+            .char-name { font-size: 1.1em; }
+            .char-job { font-size: 0.85em; margin-bottom: 4px; }
+            .stars { font-size: 1.3em; margin: 4px 0; }
+            .char-skill { font-size: 0.75em; margin-top: 4px; }
+            .hand-area { padding: 12px 10px; }
+            .hand-label { font-size: 1em; margin-bottom: 10px; }
+
+            /* カードをスマホサイズに */
+            .card {
+                width: 52px;
+                height: 72px;
+                border-radius: 6px;
+            }
+            .card-suit { font-size: 1.5em; }
+            .card-rank { font-size: 1.1em; }
+            .cards { gap: 6px; }
+
+            /* 下固定ボタンバー */
+            #mobileActionBar {
+                display: flex;
+                position: fixed;
+                bottom: 0; left: 0; right: 0;
+                background: rgba(20, 10, 5, 0.97);
+                border-top: 1px solid rgba(212,165,116,0.4);
+                padding: 10px 12px;
+                gap: 8px;
+                align-items: center;
+                z-index: 500;
+                justify-content: center;
+            }
+            #mobileActionBar .exchange-count {
+                font-size: 0.8em;
+                color: #c9a870;
+                text-align: center;
+                white-space: nowrap;
+            }
+            #mobileActionBar button {
+                padding: 12px 18px;
+                font-size: 0.95em;
+                min-width: 100px;
+                flex: 1;
+                max-width: 160px;
+            }
+            #mobileBackBtn {
+                background: transparent;
+                border: 1px solid rgba(212,165,116,0.4);
+                color: #d4a574;
+                font-size: 0.75em !important;
+                padding: 10px 10px !important;
+                min-width: auto !important;
+                max-width: 80px !important;
+                box-shadow: none;
+            }
+
+            /* ポップアップ */
+            .popup {
+                padding: 20px 16px;
+                max-width: 92vw;
+                max-height: 85vh;
+            }
+            .popup-title { font-size: 1.4em; }
+            .popup-content { font-size: 0.95em; }
+            .result-text { font-size: 1.6em; }
+
+            /* ボタン全般 */
+            button {
+                padding: 14px 24px;
+                font-size: 1.1em;
+                min-width: 140px;
+            }
+
+            /* イントロ */
+            .closeup-name { font-size: 1.5em; bottom: 70px; }
+            .closeup-job { font-size: 0.85em; bottom: 48px; }
+            #introLogo img { height: 80px; }
+            .intro-bar { height: 50px; }
+        }
+    </style>
+</head>
+<body>
+    <!-- BGM -->
+    <audio id="selectBgm" src="./images/select_bgm.mp3" loop preload="auto"></audio>
+    <audio id="battleBgm" src="./images/battle_bgm.mp3" loop preload="auto"></audio>
+    <!-- 効果音 -->
+    <audio id="se_start"    src="./images/start.mp3"    preload="auto"></audio>
+    <audio id="se_btlstart" src="./images/btlstart.mp3" preload="auto"></audio>
+    <audio id="se_btm"      src="./images/btm.mp3"      preload="auto"></audio>
+    <audio id="se_punch"    src="./images/punch.mp3"    preload="auto"></audio>
+    <audio id="se_change"   src="./images/change.mp3"   preload="auto"></audio>
+    <audio id="se_win"      src="./images/win.mp3"      preload="auto"></audio>
+    <audio id="se_lose"     src="./images/lose.mp3"     preload="auto"></audio>
+    <audio id="se_star"     src="./images/star.mp3"     preload="auto"></audio>
+
+    <!-- オープニング画面 -->
+    <div id="introScreen">
+        <div class="intro-bar intro-bar-top"></div>
+        <div class="intro-bar intro-bar-bottom"></div>
+
+        <!-- クローズアップシーン -->
+        <div id="introCloseup">
+            <div class="closeup-slide" id="cs0">
+                <img src="./images/guren.jpg" alt="">
+                <div class="closeup-line closeup-line-top" id="cl0t"></div>
+                <div class="closeup-line closeup-line-bottom" id="cl0b"></div>
+                <div class="closeup-name" id="cn0">紅　蓮</div>
+                <div class="closeup-job" id="cj0">遊女・花魁</div>
+            </div>
+            <div class="closeup-slide" id="cs1">
+                <img src="./images/goutarou.jpg" alt="">
+                <div class="closeup-line closeup-line-top" id="cl1t"></div>
+                <div class="closeup-line closeup-line-bottom" id="cl1b"></div>
+                <div class="closeup-name" id="cn1">荒波 轟太郎</div>
+                <div class="closeup-job" id="cj1">力士</div>
+            </div>
+            <div class="closeup-slide" id="cs2">
+                <img src="./images/tsukikage.jpg" alt="">
+                <div class="closeup-line closeup-line-top" id="cl2t"></div>
+                <div class="closeup-line closeup-line-bottom" id="cl2b"></div>
+                <div class="closeup-name" id="cn2">月　影</div>
+                <div class="closeup-job" id="cj2">船頭</div>
+            </div>
+            <div class="closeup-slide" id="cs3">
+                <img src="./images/ryunosuke.jpg" alt="">
+                <div class="closeup-line closeup-line-top" id="cl3t"></div>
+                <div class="closeup-line closeup-line-bottom" id="cl3b"></div>
+                <div class="closeup-name" id="cn3">竜之介</div>
+                <div class="closeup-job" id="cj3">火消し</div>
+            </div>
+            <div class="closeup-slide" id="cs4">
+                <img src="./images/hayate.jpg" alt="">
+                <div class="closeup-line closeup-line-top" id="cl4t"></div>
+                <div class="closeup-line closeup-line-bottom" id="cl4b"></div>
+                <div class="closeup-name" id="cn4">疾　風</div>
+                <div class="closeup-job" id="cj4">飛脚</div>
+            </div>
+        </div>
+
+        <!-- 全員集合シーン -->
+        <div id="introAllScene">
+            <!-- 花魁を中央に、左右対称に配置 -->
+            <img class="all-chara" id="ac0" src="./images/hayate.jpg"    style="left:2%;  width:17%; height:75%;">
+            <img class="all-chara" id="ac1" src="./images/ryunosuke.jpg" style="left:17%; width:19%; height:80%;">
+            <img class="all-chara" id="ac2" src="./images/guren.jpg"     style="left:50%; transform:translateX(-50%) translateY(30px); width:22%; height:90%; z-index:2;">
+            <img class="all-chara" id="ac3" src="./images/goutarou.jpg"  style="right:17%;width:19%; height:80%;">
+            <img class="all-chara" id="ac4" src="./images/tsukikage.jpg" style="right:2%; width:17%; height:75%;">
+        </div>
+
+        <!-- ロゴ -->
+        <div id="introLogo">
+            <div style="text-align:center;">
+                <img src="./images/logo.png" alt="江戸戯掛 札戦">
+                <div id="introStartBtn" style="opacity:0; margin-top:20px;">
+                    <button onclick="playSound('se_start'); startFromIntro()" style="background:transparent; border:1px solid rgba(212,165,116,0.7); color:#d4a574; font-size:1em; padding:12px 40px; min-width:auto; box-shadow:none; letter-spacing:0.2em; font-family:'Hiragino Mincho ProN',serif;">
+                        ― はじめる ―
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="intro-skip" onclick="playSound('se_btm'); skipIntro()">タップでスキップ ▶</div>
+    </div>
+
+
+    <!-- 難易度選択画面 -->
+    <div id="difficultyScreen">
+        <div class="diff-title">― 難易度を選んでください ―</div>
+        <div class="diff-buttons">
+            <button class="diff-btn" onclick="playSound('se_btm'); selectDifficulty('easy')">
+                <div class="diff-btn-name"><img src="./images/easy.png" alt="易" style="width:70px;height:70px;object-fit:contain;vertical-align:middle;"><span class="diff-btn-level">（難易度：低）</span></div>
+                <div class="diff-btn-desc">敵はランダムに交換 / 手札交換 2回</div>
+            </button>
+            <button class="diff-btn" onclick="playSound('se_btm'); selectDifficulty('normal')">
+                <div class="diff-btn-name"><img src="./images/nomal.png" alt="平" style="width:70px;height:70px;object-fit:contain;vertical-align:middle;"><span class="diff-btn-level">（難易度：普通）</span></div>
+                <div class="diff-btn-desc">敵はペアを残して交換 / 手札交換 1回</div>
+            </button>
+            <button class="diff-btn" onclick="playSound('se_btm'); selectDifficulty('hard')">
+                <div class="diff-btn-name"><img src="./images/diff.png" alt="難" style="width:70px;height:70px;object-fit:contain;vertical-align:middle;"><span class="diff-btn-level">（難易度：高）</span></div>
+                <div class="diff-btn-desc">敵はフラッシュ・ストレートも狙う / 手札交換 1回</div>
+            </button>
+        </div>
+    </div>
+
+    <div class="container">
+        <header style="position:relative;">
+            <img src="./images/logo.png" alt="江戸戯掛 札戦" style="height:48px; object-fit:contain; display:block; margin:0 auto;">
+            <button id="bgmToggle" onclick="toggleBgm()" style="position:absolute; top:12px; right:15px; background:transparent; border:1px solid rgba(212,165,116,0.4); color:#d4a574; font-size:1.2em; padding:5px 10px; min-width:auto; box-shadow:none; border-radius:8px;">🔊</button>
+            <button onclick="playSound('se_btm'); openDrawer()" style="position:absolute; top:12px; left:15px; background:transparent; border:1px solid rgba(212,165,116,0.4); color:#d4a574; font-size:0.75em; padding:5px 12px; min-width:auto; box-shadow:none; border-radius:8px; letter-spacing:0.15em;">MENU</button>
+        </header>
+
+        <!-- ドロワーメニュー -->
+        <div id="drawerOverlay" onclick="closeDrawer()" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.6); z-index:800;"></div>
+        <div id="drawerMenu" style="position:fixed; top:0; left:0; bottom:0; width:260px; background:linear-gradient(to bottom, #2a1a0e, #1a0f0a); border-right:1px solid rgba(212,165,116,0.35); z-index:801; transform:translateX(-100%); transition:transform 0.32s cubic-bezier(0.22,0.61,0.36,1); display:flex; flex-direction:column; padding:0;">
+            <!-- ドロワーヘッダー -->
+            <div style="padding:20px 20px 16px; border-bottom:1px solid rgba(212,165,116,0.2); display:flex; justify-content:space-between; align-items:center;">
+                <span style="color:#d4a574; font-size:0.8em; letter-spacing:0.25em; font-family:'Hiragino Mincho ProN','Yu Mincho',serif;">MENU</span>
+                <button onclick="playSound('se_btm'); closeDrawer()" style="background:transparent; border:none; color:#d4a574; font-size:1.3em; padding:0; min-width:auto; box-shadow:none; line-height:1;">✕</button>
+            </div>
+            <!-- メニュー項目 -->
+            <nav style="flex:1; padding:12px 0;">
+                <button onclick="playSound('se_btm'); closeDrawer(); showMenuScreen('news')"    class="drawer-item">📰 最新情報</button>
+                <button onclick="playSound('se_btm'); closeDrawer(); showMenuScreen('howto')"   class="drawer-item">📖 遊び方</button>
+                <button onclick="playSound('se_btm'); closeDrawer(); showMenuScreen('charas')"  class="drawer-item">⚔ キャラクター</button>
+                <button onclick="playSound('se_btm'); closeDrawer(); showMenuScreen('credit')"             class="drawer-item">🎬 CREDIT</button>
+            </nav>
+            <div style="padding:16px 20px; color:rgba(160,128,96,0.4); font-size:0.6em; letter-spacing:0.1em;">©2026 HANADAKIKAKU</div>
+        </div>
+
+
+        <!-- メニュースクリーン（全画面ページ切り替え） -->
+        <div id="menuScreen" style="display:none; position:fixed; inset:0; background:linear-gradient(to bottom,#2c1810,#1a0f0a); z-index:700; overflow-y:auto; flex-direction:column;">
+            <div style="position:sticky; top:0; background:rgba(26,10,6,0.95); border-bottom:1px solid rgba(212,165,116,0.3); padding:12px 16px; display:flex; align-items:center; gap:12px; z-index:10;">
+                <button onclick="playSound('se_btm'); closeMenuScreen()" style="background:transparent; border:1px solid rgba(212,165,116,0.4); color:#d4a574; font-size:0.8em; padding:6px 14px; min-width:auto; box-shadow:none; border-radius:8px; letter-spacing:0.1em;">← 戻る</button>
+                <span id="menuScreenTitle" style="color:#d4a574; font-size:0.95em; letter-spacing:0.2em; font-family:'Hiragino Mincho ProN','Yu Mincho',serif;"></span>
+            </div>
+            <div id="menuScreenBody" style="padding:24px 20px 60px; max-width:600px; margin:0 auto; width:100%;"></div>
+        </div>
+
+        <!-- キャラ選択画面 -->
+        <div id="characterSelectScreen">
+            <div class="select-title-row">
+                <div class="select-title">キャラクターを選択してください</div>
+                <div style="position:relative; z-index:1; flex-shrink:0;">
+                    <button onclick="playSound('se_btm'); openDifficultySelect()" style="background:transparent; border:1px solid rgba(212,165,116,0.4); color:#a08060; font-size:0.72em; padding:6px 18px; min-width:auto; box-shadow:none; border-radius:8px; letter-spacing:0.15em;">難易度：<span id="currentDiffLabel">平</span></button>
+                </div>
+            </div>
+            <div class="character-carousel">
+                <button class="carousel-button left" onclick="playSound('se_btm'); prevCharacter()">&#9664;&#xFE0E;</button>
+                <div class="character-select" id="characterList"></div>
+                <button class="carousel-button right" onclick="playSound('se_btm'); nextCharacter()">&#9654;&#xFE0E;</button>
+            </div>
+            <div class="start-button-area">
+                <button onclick="playSound('se_btlstart'); startBattle()" id="startButton">決闘開始</button>
+            </div>
+            <div style="text-align:center; color:rgba(160,128,96,0.5); font-size:0.65em; letter-spacing:0.12em; padding:6px 0 4px; flex-shrink:0;">©2026 HANADAKIKAKU. All rights reserved.</div>
+        </div>
+
+        <!-- バトル画面 -->
+        <div id="battleScreen" class="battle-screen">
+            <!-- 左：プレイヤー -->
+            <div class="player-area">
+                <div class="character-info">
+                    <img id="playerImage" class="character-info-image" src="" alt="プレイヤー">
+                    <div class="character-info-text">
+                        <div class="char-name" id="playerName"></div>
+                        <div class="char-job" id="playerJob"></div>
+                        <div class="stars" id="playerStars"></div>
+                        <div class="char-skill" id="playerSkill"></div>
+                    </div>
+                </div>
+                <div class="hand-area">
+                    <div class="hand-label">あなたの手札</div>
+                    <div class="cards" id="playerCards"></div>
+                </div>
+            </div>
+
+            <!-- 中央：ボタン -->
+            <div class="center-area">
+                <div class="vs-text">VS</div>
+                <button onclick="playSound('se_btm'); exchangeCards()" id="exchangeButton">交換</button>
+                <div class="exchange-count">
+                    交換回数: <span id="exchangeCount">2</span>
+                </div>
+                <button onclick="playSound('se_btm'); showdown()" id="showdownButton" class="danger">勝負！</button>
+                <button onclick="playSound('se_change'); backToCharacterSelect()" style="margin-top: 20px; padding: 12px 25px; font-size: 0.9em; opacity: 0.7;">キャラクター選択に戻る</button>
+                <div id="battleDiffLabel" style="text-align:center; color:#c9a870; font-size:0.9em; letter-spacing:0.18em; margin-top:8px;"></div>
+                <div style="text-align:center; color:rgba(160,128,96,0.5); font-size:0.6em; letter-spacing:0.12em; margin-top:4px;">©2026 HANADAKIKAKU. All rights reserved.</div>
+            </div>
+
+            <!-- 右：相手 -->
+            <div class="enemy-area">
+                <div class="character-info">
+                    <img id="enemyImage" class="character-info-image" src="" alt="相手">
+                    <div class="character-info-text">
+                        <div class="char-name" id="enemyName"></div>
+                        <div class="char-job" id="enemyJob"></div>
+                        <div class="stars" id="enemyStars"></div>
+                        <div class="char-skill" id="enemySkill"></div>
+                    </div>
+                </div>
+                <div class="hand-area">
+                    <div class="hand-label">相手の手札</div>
+                    <div class="cards" id="enemyCards"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 敵の勝負要求オーバーレイ -->
+        <div class="popup-overlay" id="challengeOverlay">
+            <div class="popup" style="text-align:center; max-width:400px;">
+                <div class="popup-title" id="challengeTitle">⚔️ 勝負を挑まれた！</div>
+                <div class="popup-content" id="challengeMessage" style="margin-bottom:20px;"></div>
+                <div style="display:flex; gap:15px; justify-content:center; margin-top:20px;">
+                    <button onclick="playSound('se_btm'); acceptChallenge()" class="danger" style="min-width:120px; padding:14px 20px;">受ける</button>
+                    <button onclick="playSound('se_btm'); rejectChallenge()" id="rejectButton" style="min-width:120px; padding:14px 20px;">断る</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 今日の一言オーバーレイ -->
+        <div class="popup-overlay" id="quoteOverlay">
+            <div class="popup" style="text-align:center; max-width:380px;">
+                <div style="font-size:0.85em; color:#a08060; letter-spacing:0.1em; margin-bottom:12px;">― 今日の一言 ―</div>
+                <img id="quoteCharaImage" src="" alt="" style="width:80px; height:110px; object-fit:cover; object-position:top; border-radius:8px; border:2px solid #d4a574; margin-bottom:14px;">
+                <div id="quoteCharaName" style="font-size:1.1em; color:#ffd700; font-family:'Hiragino Mincho ProN',serif; margin-bottom:10px;"></div>
+                <div id="quoteText" style="font-size:1.05em; color:#e8e0d0; line-height:1.9; font-family:'Hiragino Mincho ProN',serif; padding:0 10px;"></div>
+                <div class="popup-button" style="margin-top:20px;">
+                    <button onclick="playSound('se_btm'); closeQuote()" style="padding:10px 30px; font-size:0.95em; min-width:auto;">閉じる</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ポップアップ -->
+        <div class="popup-overlay" id="popupOverlay">
+            <div class="popup">
+                <div class="popup-title" id="popupTitle">バトルログ</div>
+                <div class="popup-content" id="popupContent"></div>
+                <div class="popup-button">
+                    <button onclick="playSound('se_btm'); closePopup()" id="popupButton">閉じる</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 敵登場アニメーションオーバーレイ -->
+    <div id="enemyIntroOverlay" style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; z-index:500; background:rgba(0,0,0,0.85); align-items:center; justify-content:center; overflow:hidden;">
+        <div id="enemyIntroCard" style="display:flex; flex-direction:column; align-items:center; gap:18px; transform:translateX(110vw); will-change:transform;">
+            <div id="enemyIntroLabel" style="font-size:1.1em; color:#d4a574; letter-spacing:0.25em; font-family:'Hiragino Mincho ProN','Yu Mincho',serif; opacity:0.85;">次の対戦</div>
+            <img id="enemyIntroImg" src="" alt="" style="width:160px; height:220px; object-fit:cover; object-position:top center; border-radius:12px; border:2px solid #d4a574; box-shadow:0 8px 30px rgba(0,0,0,0.8);">
+            <div id="enemyIntroName" style="font-size:2em; color:#ffd700; font-weight:bold; font-family:'Hiragino Mincho ProN','Yu Mincho',serif; letter-spacing:0.15em; text-shadow:2px 2px 8px rgba(0,0,0,0.9);"></div>
+        </div>
+    </div>
+
+    <!-- スマホ用下固定アクションバー -->
+    <div id="mobileActionBar" style="display:none;">
+        <button id="mobileBackBtn" onclick="playSound('se_change'); backToCharacterSelect()">戻る</button>
+        <div style="display:flex; flex-direction:column; align-items:center; gap:2px;">
+            <div class="exchange-count">交換: <span id="exchangeCountMobile">2</span></div>
+            <div id="mobileDiffLabel" style="font-size:0.7em; color:#c9a870; letter-spacing:0.1em;"></div>
+        </div>
+        <button id="mobileExchangeBtn" onclick="playSound('se_btm'); exchangeCards()">交換</button>
+        <button id="mobileShowdownBtn" onclick="playSound('se_btm'); showdown()" class="danger">勝負！</button>
+    </div>
+
+    <script>
+        // キャラクターデータ（5人に絞る）
+        const characters = [
+            { id: 1, name: "紅蓮", job: "遊女（花魁）", skill: "♥が3枚以上で役が1ランクアップ", skillName: "花街の色仕掛け", hp: 100, skillType: "wildHearts", image: "./images/guren.jpg", imageUp: "./images/guren_up.png" },
+            { id: 5, name: "荒波 轟太郎", job: "力士", skill: "引き分けの時に勝ちになる", skillName: "土俵際の巨浪", hp: 100, skillType: "drawWin", image: "./images/goutarou.jpg", imageUp: "./images/goutarou_up.png" },
+            { id: 9, name: "月影", job: "船頭", skill: "6枚から最良の5枚で戦う", skillName: "水無月の五月雨", hp: 100, skillType: "extraCard", image: "./images/tsukikage.jpg", imageUp: "./images/tsukikage_up.png" },
+            { id: 16, name: "竜之介", job: "火消し", skill: "負けたラウンドを1度だけ無効化", skillName: "赤竜の火焔", hp: 100, skillType: "nullifyLoss", image: "./images/ryunosuke.jpg", imageUp: "./images/ryunosuke_up.png" },
+            { id: 19, name: "疾風", job: "飛脚", skill: "交換が3回できる", skillName: "風神の夜半嵐", hp: 100, skillType: "threeExchange", image: "./images/hayate.jpg", imageUp: "./images/hayate_up.png" }
+        ];
+
+        let selectedCharacter = null;
+        let enemyCharacter = null;
+        let playerHand = [];
+        let enemyHand = [];
+        let deck = [];
+        let exchangeRemaining = 2;
+        let selectedCards = [];
+        let battleLog = [];
+        let playerWins = 0; // 獲得した星の数
+        let enemyWins = 0; // 獲得した星の数
+        let roundCount = 0; // 現在のラウンド数
+        let playerNullifyUsed = false; // 竜之介スキル使用済みフラグ（プレイヤー）
+        let enemyNullifyUsed = false;  // 竜之介スキル使用済みフラグ（敵）
+        let playerHasExchanged = false; // プレイヤーが交換済みかどうか
+
+        // BGM制御
+        const bgmVolume = 0.5;
+        let bgmEnabled = true;
+
+        function playSelectBgm() {
+            if (!bgmEnabled) return;
+            const battle = document.getElementById('battleBgm');
+            const select = document.getElementById('selectBgm');
+            battle.pause(); battle.currentTime = 0;
+            select.volume = bgmVolume;
+            select.play().catch(() => {});
+        }
+        function playBattleBgm() {
+            if (!bgmEnabled) return;
+            const battle = document.getElementById('battleBgm');
+            const select = document.getElementById('selectBgm');
+            select.pause(); select.currentTime = 0;
+            battle.volume = bgmVolume;
+            battle.play().catch(() => {});
+        }
+        function stopAllBgm() {
+            document.getElementById('battleBgm').pause();
+            document.getElementById('selectBgm').pause();
+        }
+        function toggleBgm() {
+            bgmEnabled = !bgmEnabled;
+            const btn = document.getElementById('bgmToggle');
+            if (bgmEnabled) {
+                btn.textContent = '🔊';
+                playSound('se_btm');
+                if (document.getElementById('battleScreen').classList.contains('active')) {
+                    playBattleBgm();
+                } else {
+                    playSelectBgm();
+                }
+            } else {
+                btn.textContent = '🔇';
+                stopAllBgm();
+            }
+        }
+
+        // 初期化
+        let currentCharacterIndex = 0;
+        let isAnimating = false;
+        let _suppressClick = false;
+
+        // ドロワーメニュー
+        function openDrawer() {
+            document.getElementById('drawerOverlay').style.display = 'block';
+            document.getElementById('drawerMenu').style.transform = 'translateX(0)';
+        }
+        function closeDrawer() {
+            document.getElementById('drawerOverlay').style.display = 'none';
+            document.getElementById('drawerMenu').style.transform = 'translateX(-100%)';
+        }
+
+        // メニュースクリーン（全画面ページ切り替え）
+        const menuScreenContent = {
+            news: {
+                title: '📰 最新情報',
+                body: `
+                    <div style="display:flex; flex-direction:column; gap:0;">
+                        <div style="border-bottom:1px solid rgba(212,165,116,0.15); padding:18px 0;">
+                            <div style="color:#d4a574; font-size:0.78em; letter-spacing:0.12em; margin-bottom:8px;">2026.03.15</div>
+                            <div style="color:#e8e0d0; line-height:1.8; margin-bottom:4px;">アップデートしました。</div>
+                            <div style="color:#aaa; font-size:0.9em; line-height:1.8;">・難易度を変更できるようにしました</div>
+                            <div style="color:#aaa; font-size:0.9em; line-height:1.8;">・効果音を追加しました</div>
+                            <div style="color:#aaa; font-size:0.9em; line-height:1.8;">・ラウンドを最大3回でなく★を2つ先取するまで続けるように変更しました</div>
+                            <div style="color:#aaa; font-size:0.9em; line-height:1.8;">・その他軽微な修正を行いました</div>
+                        </div>
+                        <div style="border-bottom:1px solid rgba(212,165,116,0.15); padding:18px 0;">
+                            <div style="color:#d4a574; font-size:0.78em; letter-spacing:0.12em; margin-bottom:8px;">2026.03.10</div>
+                            <div style="color:#e8e0d0; line-height:1.8; margin-bottom:4px;">アップデートしました。</div>
+                            <div style="color:#aaa; font-size:0.9em; line-height:1.8;">・カードの視認性を改善しました</div>
+                            <div style="color:#aaa; font-size:0.9em; line-height:1.8;">・バトル画面のキャラクター画像をアップにしました</div>
+                            <div style="color:#aaa; font-size:0.9em; line-height:1.8;">・得意技名を追加しました</div>
+                        </div>
+                        <div style="border-bottom:1px solid rgba(212,165,116,0.15); padding:18px 0;">
+                            <div style="color:#d4a574; font-size:0.78em; letter-spacing:0.12em; margin-bottom:8px;">2026.03.06</div>
+                            <div style="color:#e8e0d0; line-height:1.8; margin-bottom:4px;">バグ、演出を修正しました。</div>
+                            <div style="color:#e8e0d0; line-height:1.8;">サイトメニューを追加しました。</div>
+                        </div>
+                        <div style="border-bottom:1px solid rgba(212,165,116,0.15); padding:18px 0;">
+                            <div style="color:#d4a574; font-size:0.78em; letter-spacing:0.12em; margin-bottom:8px;">2026.03.05</div>
+                            <div style="color:#e8e0d0; line-height:1.8; margin-bottom:4px;">「江戸戯掛 -札戦-」β版を公開しました。</div>
+                            <div style="color:#aaa; font-size:0.9em; line-height:1.7;">今後もキャラクター追加や新機能を予定しています。お楽しみに！</div>
+                        </div>
+                    </div>
+                `
+            },
+            howto: {
+                title: '📖 遊び方',
+                body: `
+                    <div style="display:flex; flex-direction:column; gap:22px;">
+                        <div>
+                            <div style="color:#d4a574; font-size:0.82em; letter-spacing:0.15em; margin-bottom:8px; padding-bottom:6px; border-bottom:1px solid rgba(212,165,116,0.25);">🎴 基本ルール</div>
+                            <div style="color:#e8e0d0; line-height:1.9;">キャラクターを選び、★を2つ先取するまで戦い続けるポーカー対戦です。</div>
+                        </div>
+                        <div>
+                            <div style="color:#d4a574; font-size:0.82em; letter-spacing:0.15em; margin-bottom:8px; padding-bottom:6px; border-bottom:1px solid rgba(212,165,116,0.25);">🔄 カード交換</div>
+                            <div style="color:#e8e0d0; line-height:1.9;">不要なカードをタップして選び、「交換」ボタンで引き直せます（通常2回まで）。もう一度タップで選択解除。</div>
+                        </div>
+                        <div>
+                            <div style="color:#d4a574; font-size:0.82em; letter-spacing:0.15em; margin-bottom:8px; padding-bottom:6px; border-bottom:1px solid rgba(212,165,116,0.25);">⚔ 勝負</div>
+                            <div style="color:#e8e0d0; line-height:1.9;">「勝負！」ボタンで役を比べ、強い役が勝ち。★を2つ先取した方が対戦に勝利！引き分けは★なし。</div>
+                        </div>
+                        <div>
+                            <div style="color:#d4a574; font-size:0.82em; letter-spacing:0.15em; margin-bottom:8px; padding-bottom:6px; border-bottom:1px solid rgba(212,165,116,0.25);">✨ キャラ特技</div>
+                            <div style="color:#e8e0d0; line-height:1.9;">各キャラクターが固有の特技を持っています。特技を活かした戦い方を見つけよう。</div>
+                        </div>
+                        <div>
+                            <div style="color:#d4a574; font-size:0.82em; letter-spacing:0.15em; margin-bottom:8px; padding-bottom:6px; border-bottom:1px solid rgba(212,165,116,0.25);">⚙ 難易度</div>
+                            <div style="display:flex; flex-direction:column; gap:8px;">
+                                <div style="display:flex; align-items:baseline; gap:10px; background:rgba(255,255,255,0.03); border-radius:7px; padding:9px 12px;">
+                                    <span style="color:#ffd700; font-weight:bold; font-size:1.1em; min-width:20px; font-family:'Hiragino Mincho ProN','Yu Mincho',serif;">易</span>
+                                    <div><div style="color:#e8e0d0;">敵はランダムに交換 / 手札交換 2回</div></div>
+                                </div>
+                                <div style="display:flex; align-items:baseline; gap:10px; background:rgba(255,255,255,0.03); border-radius:7px; padding:9px 12px;">
+                                    <span style="color:#ffd700; font-weight:bold; font-size:1.1em; min-width:20px; font-family:'Hiragino Mincho ProN','Yu Mincho',serif;">平</span>
+                                    <div><div style="color:#e8e0d0;">敵はペアを残して交換 / 手札交換 1回</div></div>
+                                </div>
+                                <div style="display:flex; align-items:baseline; gap:10px; background:rgba(255,255,255,0.03); border-radius:7px; padding:9px 12px;">
+                                    <span style="color:#ffd700; font-weight:bold; font-size:1.1em; min-width:20px; font-family:'Hiragino Mincho ProN','Yu Mincho',serif;">難</span>
+                                    <div><div style="color:#e8e0d0;">敵はフラッシュ・ストレートも狙う / 手札交換 1回</div></div>
+                                </div>
+                                <div style="color:#aaa; font-size:0.85em; line-height:1.7; margin-top:4px;">難易度はキャラクター選択画面からいつでも変更できます。</div>
+                            </div>
+                        </div>
+                        <div>
+                            <div style="color:#d4a574; font-size:0.82em; letter-spacing:0.15em; margin-bottom:12px; padding-bottom:6px; border-bottom:1px solid rgba(212,165,116,0.25);">🃏 役の強さ（弱い → 強い）</div>
+                            <div style="display:flex; flex-direction:column; gap:6px;">
+                                <div style="display:flex; align-items:center; gap:10px; background:rgba(255,255,255,0.03); border-radius:7px; padding:9px 12px;">
+                                    <span style="color:#ffd700; font-size:1em; min-width:24px; text-align:center;">1</span>
+                                    <div><div style="color:#e8e0d0; font-weight:bold;">ノーペア</div><div style="color:#888; font-size:0.82em;">役なし。最も数字の高いカードで勝負</div></div>
+                                </div>
+                                <div style="display:flex; align-items:center; gap:10px; background:rgba(255,255,255,0.03); border-radius:7px; padding:9px 12px;">
+                                    <span style="color:#ffd700; font-size:1em; min-width:24px; text-align:center;">2</span>
+                                    <div><div style="color:#e8e0d0; font-weight:bold;">ワンペア</div><div style="color:#888; font-size:0.82em;">同じ数字が2枚</div></div>
+                                </div>
+                                <div style="display:flex; align-items:center; gap:10px; background:rgba(255,255,255,0.03); border-radius:7px; padding:9px 12px;">
+                                    <span style="color:#ffd700; font-size:1em; min-width:24px; text-align:center;">3</span>
+                                    <div><div style="color:#e8e0d0; font-weight:bold;">ツーペア</div><div style="color:#888; font-size:0.82em;">ペアが2組</div></div>
+                                </div>
+                                <div style="display:flex; align-items:center; gap:10px; background:rgba(255,255,255,0.03); border-radius:7px; padding:9px 12px;">
+                                    <span style="color:#ffd700; font-size:1em; min-width:24px; text-align:center;">4</span>
+                                    <div><div style="color:#e8e0d0; font-weight:bold;">スリーカード</div><div style="color:#888; font-size:0.82em;">同じ数字が3枚</div></div>
+                                </div>
+                                <div style="display:flex; align-items:center; gap:10px; background:rgba(255,255,255,0.03); border-radius:7px; padding:9px 12px;">
+                                    <span style="color:#ffd700; font-size:1em; min-width:24px; text-align:center;">5</span>
+                                    <div><div style="color:#e8e0d0; font-weight:bold;">ストレート</div><div style="color:#888; font-size:0.82em;">数字が5枚連続（例：5-6-7-8-9）</div></div>
+                                </div>
+                                <div style="display:flex; align-items:center; gap:10px; background:rgba(255,255,255,0.03); border-radius:7px; padding:9px 12px;">
+                                    <span style="color:#ffd700; font-size:1em; min-width:24px; text-align:center;">6</span>
+                                    <div><div style="color:#e8e0d0; font-weight:bold;">フラッシュ</div><div style="color:#888; font-size:0.82em;">5枚全て同じマーク</div></div>
+                                </div>
+                                <div style="display:flex; align-items:center; gap:10px; background:rgba(255,255,255,0.03); border-radius:7px; padding:9px 12px;">
+                                    <span style="color:#ffd700; font-size:1em; min-width:24px; text-align:center;">7</span>
+                                    <div><div style="color:#e8e0d0; font-weight:bold;">フルハウス</div><div style="color:#888; font-size:0.82em;">スリーカード＋ペアの組み合わせ</div></div>
+                                </div>
+                                <div style="display:flex; align-items:center; gap:10px; background:rgba(255,255,255,0.03); border-radius:7px; padding:9px 12px;">
+                                    <span style="color:#ffd700; font-size:1em; min-width:24px; text-align:center;">8</span>
+                                    <div><div style="color:#e8e0d0; font-weight:bold;">フォーカード</div><div style="color:#888; font-size:0.82em;">同じ数字が4枚</div></div>
+                                </div>
+                                <div style="display:flex; align-items:center; gap:10px; background:rgba(255,255,255,0.03); border-radius:7px; padding:9px 12px;">
+                                    <span style="color:#ffd700; font-size:1em; min-width:24px; text-align:center;">9</span>
+                                    <div><div style="color:#e8e0d0; font-weight:bold;">ストレートフラッシュ</div><div style="color:#888; font-size:0.82em;">同じマークで5枚連続</div></div>
+                                </div>
+                                <div style="display:flex; align-items:center; gap:10px; background:rgba(255,215,0,0.07); border:1px solid rgba(255,215,0,0.25); border-radius:7px; padding:9px 12px;">
+                                    <span style="color:#ffd700; font-size:1em; min-width:24px; text-align:center;">👑</span>
+                                    <div><div style="color:#ffd700; font-weight:bold;">ロイヤルストレートフラッシュ</div><div style="color:#888; font-size:0.82em;">同じマークの A・10・J・Q・K</div></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div style="margin-top:10px; padding:14px 16px; background:rgba(255,255,255,0.03); border:1px solid rgba(212,165,116,0.2); border-radius:8px;">
+                            <div style="color:#a08060; font-size:0.82em; line-height:1.9; text-align:center; letter-spacing:0.05em;">
+                                このゲームは個人制作のブラウザゲームです。<br>
+                                賭博・課金要素はありません。
+                            </div>
+                        </div>
+                    </div>
+                `
+            },
+            charas: {
+                title: '⚔ キャラクター',
+                body: `
+                    <div style="display:flex; flex-direction:column; gap:16px;">
+                        <div style="display:flex; gap:14px; align-items:flex-start; background:rgba(255,255,255,0.03); border-radius:10px; padding:14px;">
+                            <img src="./images/guren.jpg" style="width:70px; height:98px; object-fit:cover; object-position:top; border-radius:8px; border:1px solid rgba(212,165,116,0.5); flex-shrink:0;">
+                            <div>
+                                <div style="color:#ffd700; font-weight:bold; font-size:1.05em; font-family:'Hiragino Mincho ProN',serif; margin-bottom:3px;">紅蓮</div>
+                                <div style="color:#c9a870; font-size:0.82em; margin-bottom:4px;">遊女・花魁</div>
+                                <div style="color:#ffd700; font-size:0.8em; letter-spacing:0.1em; margin-bottom:6px;">⚔ 花街の色仕掛け</div>
+                                <div style="color:#e8e0d0; font-size:0.88em; line-height:1.7;">【特技】♥が3枚以上で役が1ランクアップ</div>
+                            </div>
+                        </div>
+                        <div style="display:flex; gap:14px; align-items:flex-start; background:rgba(255,255,255,0.03); border-radius:10px; padding:14px;">
+                            <img src="./images/goutarou.jpg" style="width:70px; height:98px; object-fit:cover; object-position:top; border-radius:8px; border:1px solid rgba(212,165,116,0.5); flex-shrink:0;">
+                            <div>
+                                <div style="color:#ffd700; font-weight:bold; font-size:1.05em; font-family:'Hiragino Mincho ProN',serif; margin-bottom:3px;">荒波 轟太郎</div>
+                                <div style="color:#c9a870; font-size:0.82em; margin-bottom:4px;">力士</div>
+                                <div style="color:#ffd700; font-size:0.8em; letter-spacing:0.1em; margin-bottom:6px;">⚔ 土俵際の巨浪</div>
+                                <div style="color:#e8e0d0; font-size:0.88em; line-height:1.7;">【特技】引き分けのとき必ず勝利</div>
+                            </div>
+                        </div>
+                        <div style="display:flex; gap:14px; align-items:flex-start; background:rgba(255,255,255,0.03); border-radius:10px; padding:14px;">
+                            <img src="./images/tsukikage.jpg" style="width:70px; height:98px; object-fit:cover; object-position:top; border-radius:8px; border:1px solid rgba(212,165,116,0.5); flex-shrink:0;">
+                            <div>
+                                <div style="color:#ffd700; font-weight:bold; font-size:1.05em; font-family:'Hiragino Mincho ProN',serif; margin-bottom:3px;">月影</div>
+                                <div style="color:#c9a870; font-size:0.82em; margin-bottom:4px;">船頭</div>
+                                <div style="color:#ffd700; font-size:0.8em; letter-spacing:0.1em; margin-bottom:6px;">⚔ 水無月の五月雨</div>
+                                <div style="color:#e8e0d0; font-size:0.88em; line-height:1.7;">【特技】6枚配られ、最良の5枚で戦う</div>
+                            </div>
+                        </div>
+                        <div style="display:flex; gap:14px; align-items:flex-start; background:rgba(255,255,255,0.03); border-radius:10px; padding:14px;">
+                            <img src="./images/ryunosuke.jpg" style="width:70px; height:98px; object-fit:cover; object-position:top; border-radius:8px; border:1px solid rgba(212,165,116,0.5); flex-shrink:0;">
+                            <div>
+                                <div style="color:#ffd700; font-weight:bold; font-size:1.05em; font-family:'Hiragino Mincho ProN',serif; margin-bottom:3px;">竜之介</div>
+                                <div style="color:#c9a870; font-size:0.82em; margin-bottom:4px;">火消し</div>
+                                <div style="color:#ffd700; font-size:0.8em; letter-spacing:0.1em; margin-bottom:6px;">⚔ 赤竜の火焔</div>
+                                <div style="color:#e8e0d0; font-size:0.88em; line-height:1.7;">【特技】負けたラウンドを1度だけ無効化</div>
+                            </div>
+                        </div>
+                        <div style="display:flex; gap:14px; align-items:flex-start; background:rgba(255,255,255,0.03); border-radius:10px; padding:14px;">
+                            <img src="./images/hayate.jpg" style="width:70px; height:98px; object-fit:cover; object-position:top; border-radius:8px; border:1px solid rgba(212,165,116,0.5); flex-shrink:0;">
+                            <div>
+                                <div style="color:#ffd700; font-weight:bold; font-size:1.05em; font-family:'Hiragino Mincho ProN',serif; margin-bottom:3px;">疾風</div>
+                                <div style="color:#c9a870; font-size:0.82em; margin-bottom:4px;">飛脚</div>
+                                <div style="color:#ffd700; font-size:0.8em; letter-spacing:0.1em; margin-bottom:6px;">⚔ 風神の夜半嵐</div>
+                                <div style="color:#e8e0d0; font-size:0.88em; line-height:1.7;">【特技】カード交換が3回できる</div>
+                            </div>
+                        </div>
+                    </div>
+                `
+            },
+            credit: {
+                title: '🎬 CREDIT',
+                body: `
+                    <div style="color:#ccc; font-size:0.92em; line-height:2;">
+                        <div style="color:#d4a574; font-size:0.8em; letter-spacing:0.15em; margin:0 0 6px; border-bottom:1px solid rgba(212,165,116,0.3); padding-bottom:4px;">🎵 BGM</div>
+                        <div style="color:#e8e0d0; margin-bottom:16px;">NH <span style="color:#888; font-size:0.9em;">with SUNO</span></div>
+                        <div style="color:#d4a574; font-size:0.8em; letter-spacing:0.15em; margin:0 0 6px; border-bottom:1px solid rgba(212,165,116,0.3); padding-bottom:4px;">🎨 キャラクターデザイン</div>
+                        <div style="color:#e8e0d0; margin-bottom:16px;">NH <span style="color:#888; font-size:0.9em;">with Midjourney</span></div>
+                        <div style="color:#d4a574; font-size:0.8em; letter-spacing:0.15em; margin:0 0 6px; border-bottom:1px solid rgba(212,165,116,0.3); padding-bottom:4px;">⚙️ ゲーム企画/制作</div>
+                        <div style="color:#e8e0d0; margin-bottom:16px;">NH <span style="color:#888; font-size:0.9em;">with ClaudeCode & ChatGPT</span></div>
+                        <div style="color:#d4a574; font-size:0.8em; letter-spacing:0.15em; margin:0 0 6px; border-bottom:1px solid rgba(212,165,116,0.3); padding-bottom:4px;">🛠 使用技術</div>
+                        <div style="color:#e8e0d0;">HTML / CSS / JavaScript</div>
+                        <div style="color:#e8e0d0;">Midjourney <span style="color:#888; font-size:0.9em;">（画像生成）</span></div>
+                        <div style="color:#e8e0d0;">SUNO <span style="color:#888; font-size:0.9em;">（BGM生成）</span></div>
+                        <div style="color:#e8e0d0;">Claude by Anthropic <span style="color:#888; font-size:0.9em;">（開発補助）</span></div>
+                        <div style="color:#e8e0d0;">ChatGPT by OpenAI <span style="color:#888; font-size:0.9em;">（開発補助）</span></div>
+                    </div>
+                `
+            }
+        };
+
+        function showMenuScreen(key) {
+            const content = menuScreenContent[key];
+            document.getElementById('menuScreenTitle').textContent = content.title;
+            document.getElementById('menuScreenBody').innerHTML = content.body;
+            const screen = document.getElementById('menuScreen');
+            screen.style.display = 'flex';
+            screen.scrollTop = 0;
+        }
+        function closeMenuScreen() {
+            document.getElementById('menuScreen').style.display = 'none';
+        }
+
+        // SE再生後にBGMを再開する対象を管理
+        let _bgmResumeTarget = null;
+
+        function playSound(id) {
+            if (!bgmEnabled) return;
+            const el = document.getElementById(id);
+            if (!el) return;
+            el.currentTime = 0;
+
+            // se_btm以外はBGMを一時停止してSE終了後に再開
+            if (id !== 'se_btm') {
+                const selectBgm = document.getElementById('selectBgm');
+                const battleBgm = document.getElementById('battleBgm');
+                const activeBgm = !selectBgm.paused ? selectBgm : (!battleBgm.paused ? battleBgm : null);
+
+                // BGMが流れていれば止めて再開対象を更新
+                if (activeBgm && bgmEnabled) {
+                    activeBgm.pause();
+                    _bgmResumeTarget = activeBgm;
+                }
+
+                el.play().catch(() => {});
+                el.addEventListener('ended', () => {
+                    // 再開対象が残っていて両BGMがpausedの場合のみ再開
+                    if (_bgmResumeTarget && _bgmResumeTarget.paused && bgmEnabled) {
+                        const other = _bgmResumeTarget === selectBgm ? battleBgm : selectBgm;
+                        if (other.paused) {
+                            _bgmResumeTarget.play().catch(() => {});
+                        }
+                    }
+                    _bgmResumeTarget = null;
+                }, { once: true });
+                return;
+            }
+
+            el.play().catch(() => {});
+        }
+        function skipIntro() {
+            clearAllIntroTimers();
+            // クローズアップ全部消す
+            for (let i = 0; i < 5; i++) {
+                const s = document.getElementById(`cs${i}`);
+                if (s) s.style.opacity = '0';
+            }
+            // 全員集合・ロゴを即表示
+            const allScene = document.getElementById('introAllScene');
+            allScene.style.transition = 'opacity 0.3s';
+            allScene.style.opacity = '1';
+            [0,1,2,3,4].forEach(j => {
+                const ac = document.getElementById(`ac${j}`);
+                ac.style.opacity = '1';
+                ac.style.transform = j === 2 ? 'translateX(-50%) translateY(0)' : 'translateY(0)';
+            });
+            const logo = document.getElementById('introLogo');
+            logo.style.transition = 'opacity 0.3s';
+            logo.style.opacity = '1';
+            setTimeout(() => {
+                const btn = document.getElementById('introStartBtn');
+                btn.style.transition = 'opacity 0.3s';
+                btn.style.opacity = '1';
+            }, 300);
+        }
+
+        // 現在の難易度（デフォルト: normal）
+        let currentDifficulty = 'normal';
+
+        function startFromIntro() {
+            const intro = document.getElementById('introScreen');
+            intro.style.transition = 'opacity 0.5s ease';
+            intro.style.opacity = '0';
+            setTimeout(() => {
+                intro.style.display = 'none';
+                document.getElementById('difficultyScreen').classList.add('show');
+                playSelectBgm();
+            }, 500);
+        }
+
+        const diffLabels = { easy: '易', normal: '平', hard: '難' };
+
+        function selectDifficulty(level) {
+            currentDifficulty = level;
+            // GA4: 難易度選択イベント
+            gtag('event', 'difficulty_select', { difficulty: level });
+            document.getElementById('difficultyScreen').classList.remove('show');
+            // キャラ選択のラベル更新
+            const el = document.getElementById('currentDiffLabel');
+            if (el) el.textContent = diffLabels[level];
+        }
+
+        // キャラ選択画面から難易度選択を開く
+        function openDifficultySelect() {
+            document.getElementById('difficultyScreen').classList.add('show');
+        }
+
+        const introTimers = [];
+        function introTimeout(fn, ms) {
+            introTimers.push(setTimeout(fn, ms));
+        }
+        function clearAllIntroTimers() {
+            introTimers.forEach(t => clearTimeout(t));
+        }
+
+        function runIntro() {
+            // イントロ中もセレクトBGMを流す（ブラウザの自動再生制限のため初回クリック後に再生）
+            playSelectBgm();
+            const charas = [
+                { img: './images/guren.jpg',     name: '紅　蓮',     job: '遊女・花魁' },
+                { img: './images/goutarou.jpg',  name: '荒波 轟太郎', job: '力士' },
+                { img: './images/tsukikage.jpg', name: '月　影',     job: '船頭' },
+                { img: './images/ryunosuke.jpg', name: '竜之介',     job: '火消し' },
+                { img: './images/hayate.jpg',    name: '疾　風',     job: '飛脚' },
+            ];
+
+            function ease(el, props, duration) {
+                el.style.transition = `all ${duration}ms ease`;
+                Object.assign(el.style, props);
+            }
+
+            // クローズアップを1枚ずつ表示（1枚0.9秒、計4.5秒）
+            charas.forEach((_, i) => {
+                const slide  = document.getElementById(`cs${i}`);
+                const img    = slide.querySelector('img');
+                const nameEl = document.getElementById(`cn${i}`);
+                const jobEl  = document.getElementById(`cj${i}`);
+                const lineT  = document.getElementById(`cl${i}t`);
+                const lineB  = document.getElementById(`cl${i}b`);
+
+                const start = i * 900;
+
+                // フェードイン + ズームイン
+                introTimeout(() => {
+                    slide.style.transition = 'opacity 0.35s ease';
+                    slide.style.opacity = '1';
+                    img.style.transition = 'transform 0.9s ease-out';
+                    img.style.transform = 'scale(1.0)';
+
+                    // 横線フラッシュ
+                    lineT.style.transition = 'opacity 0.15s';
+                    lineB.style.transition = 'opacity 0.15s';
+                    lineT.style.opacity = '1';
+                    lineB.style.opacity = '1';
+                    setTimeout(() => { lineT.style.opacity = '0'; lineB.style.opacity = '0'; }, 200);
+
+                    // 名前フェードイン
+                    setTimeout(() => {
+                        nameEl.style.transition = 'opacity 0.4s ease';
+                        nameEl.style.opacity = '1';
+                        jobEl.style.transition = 'opacity 0.4s ease 0.1s';
+                        jobEl.style.opacity = '1';
+                    }, 200);
+                }, start);
+
+                // フェードアウト（次の直前）
+                introTimeout(() => {
+                    slide.style.transition = 'opacity 0.25s ease';
+                    slide.style.opacity = '0';
+                    nameEl.style.opacity = '0';
+                    jobEl.style.opacity = '0';
+                }, start + 820);
+            });
+
+            // 全員集合シーン（4.5秒〜）
+            introTimeout(() => {
+                const allScene = document.getElementById('introAllScene');
+                allScene.style.transition = 'opacity 0.5s ease';
+                allScene.style.opacity = '1';
+
+                // 全員を順番に登場
+                [0,1,2,3,4].forEach((j, idx) => {
+                    const ac = document.getElementById(`ac${j}`);
+                    setTimeout(() => {
+                        ac.style.transition = 'opacity 0.4s ease, transform 0.5s ease';
+                        ac.style.opacity = '1';
+                        // 中央キャラ(花魁)のtransformだけ特別扱い
+                        if (j === 2) {
+                            ac.style.transform = 'translateX(-50%) translateY(0)';
+                        } else {
+                            ac.style.transform = 'translateY(0)';
+                        }
+                    }, idx * 200);
+                });
+            }, 4500);
+
+            // ロゴ登場（6.8秒〜）
+            introTimeout(() => {
+                const logo = document.getElementById('introLogo');
+                logo.style.transition = 'opacity 0.6s ease';
+                logo.style.opacity = '1';
+                // ボタン表示
+                setTimeout(() => {
+                    const btn = document.getElementById('introStartBtn');
+                    btn.style.transition = 'opacity 0.5s ease';
+                    btn.style.opacity = '1';
+                }, 700);
+            }, 6800);
+
+            // 自動終了なし・ボタン待ち
+        }
+
+        function init() {
+            renderCharacterSelect();
+            const imgMaxH = Math.floor(window.innerHeight - 290);
+            document.documentElement.style.setProperty('--img-max-h', imgMaxH + 'px');
+            runIntro();
+            document.body.addEventListener('click', () => { playSelectBgm(); }, { once: true });
+        }
+
+        // キャラ選択画面を描画（無限ループカルーセル）
+        function renderCharacterSelect() {
+            const list = document.getElementById('characterList');
+            list.innerHTML = '';
+            list.style.transition = 'none';
+
+            // 前後にクローンを追加: [last, 0, 1, 2, ..., last, first]
+            const allItems = [
+                characters[characters.length - 1],
+                ...characters,
+                characters[0]
+            ];
+
+            allItems.forEach((char, index) => {
+                const card = document.createElement('div');
+                card.className = 'character-card';
+                card.innerHTML = `
+                    <img src="${char.image}" class="character-image" alt="${char.name}">
+                    <div class="character-name">${char.name}</div>
+                    <div class="character-job">${char.job}</div>
+                    <div class="character-skill">【特技】<span style="color:#ffd700;">「${char.skillName}」</span><br>${char.skill}</div>
+                `;
+                // activeなカードをタップ→バトル開始、非activeはそちらへ移動
+                card.addEventListener('click', () => {
+                    if (_suppressClick) { _suppressClick = false; return; }
+                    const realIndex = currentCharacterIndex + 1;
+                    if (index === realIndex) {
+                        // 選択中のカード → バトル開始
+                        playSound('se_btlstart');
+                        startBattle();
+                    } else if (index < realIndex) {
+                        prevCharacter();
+                    } else {
+                        nextCharacter();
+                    }
+                });
+                list.appendChild(card);
+            });
+
+            // 実際のインデックスは1始まり（クローン分オフセット）
+            updateCarousel(false);
+
+            // スワイプ処理
+            let touchStartX = 0;
+            let touchStartY = 0;
+            let isSwiping = false;
+
+            list.addEventListener('touchstart', (e) => {
+                touchStartX = e.touches[0].clientX;
+                touchStartY = e.touches[0].clientY;
+                isSwiping = false;
+            }, { passive: true });
+
+            list.addEventListener('touchmove', (e) => {
+                const dx = e.touches[0].clientX - touchStartX;
+                const dy = e.touches[0].clientY - touchStartY;
+                // 横方向の移動が縦より大きければスワイプと判定
+                if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 10) {
+                    isSwiping = true;
+                }
+            }, { passive: true });
+
+            list.addEventListener('touchend', (e) => {
+                if (!isSwiping) return;
+                const dx = e.changedTouches[0].clientX - touchStartX;
+                _suppressClick = true;
+                if (dx < -30) {
+                    // 左スワイプ → 次のキャラ
+                    playSound('se_btm');
+                    nextCharacter();
+                } else if (dx > 30) {
+                    // 右スワイプ → 前のキャラ
+                    playSound('se_btm');
+                    prevCharacter();
+                } else {
+                    _suppressClick = false;
+                }
+                isSwiping = false;
+            }, { passive: true });
+        }
+
+        // カード幅をCSSと一致させる（スマホ:78vw max320px / PC:50vw max340px）
+        function getCardWidth() {
+            if (window.innerWidth <= 600) {
+                return Math.min(window.innerWidth * 0.78, 320);
+            }
+            return Math.min(window.innerWidth * 0.5, 340);
+        }
+
+        // カルーセル位置更新
+        function updateCarousel(animate = true) {
+            const list = document.getElementById('characterList');
+            const cardWidth = getCardWidth();
+            // +1はクローン分のオフセット
+            const realIndex = currentCharacterIndex + 1;
+            const offset = -realIndex * (cardWidth + 30);
+
+            if (!animate) {
+                list.style.transition = 'none';
+            } else {
+                list.style.transition = 'transform 0.5s ease';
+            }
+            list.style.transform = `translateX(calc(50% - ${cardWidth/2}px + ${offset}px))`;
+
+            // activeクラス更新（クローン込みのインデックスで）
+            document.querySelectorAll('.character-card').forEach((card, index) => {
+                card.classList.toggle('active', index === realIndex);
+            });
+
+            selectedCharacter = characters[currentCharacterIndex];
+        }
+
+        // 前のキャラ
+        function prevCharacter() {
+            if (isAnimating) return;
+            isAnimating = true;
+            const list = document.getElementById('characterList');
+            const cardWidth = getCardWidth();
+
+            if (currentCharacterIndex === 0) {
+                // 紅蓮から左 → クローン疾風(realIndex=0)へアニメ
+                list.style.transition = 'transform 0.5s ease';
+                const offset = 0 * (cardWidth + 30) * -1; // realIndex=0
+                list.style.transform = `translateX(calc(50% - ${cardWidth/2}px + ${offset}px))`;
+                document.querySelectorAll('.character-card').forEach((card, index) => {
+                    card.classList.toggle('active', index === 0);
+                });
+                // アニメ後に本物の疾風(realIndex=5)へ瞬間移動
+                setTimeout(() => {
+                    currentCharacterIndex = characters.length - 1;
+                    updateCarousel(false);
+                    isAnimating = false;
+                }, 520);
+            } else {
+                currentCharacterIndex--;
+                list.style.transition = 'transform 0.5s ease';
+                updateCarousel(true);
+                setTimeout(() => { isAnimating = false; }, 520);
+            }
+        }
+
+        // 次のキャラ
+        function nextCharacter() {
+            if (isAnimating) return;
+            isAnimating = true;
+            const list = document.getElementById('characterList');
+            const cardWidth = getCardWidth();
+            const lastIndex = characters.length - 1;
+
+            if (currentCharacterIndex === lastIndex) {
+                // 疾風から右 → クローン紅蓮(realIndex=6)へアニメ
+                list.style.transition = 'transform 0.5s ease';
+                const realIndex = lastIndex + 2; // クローン紅蓮の位置
+                const offset = -realIndex * (cardWidth + 30);
+                list.style.transform = `translateX(calc(50% - ${cardWidth/2}px + ${offset}px))`;
+                document.querySelectorAll('.character-card').forEach((card, index) => {
+                    card.classList.toggle('active', index === realIndex);
+                });
+                // アニメ後に本物の紅蓮(realIndex=1)へ瞬間移動
+                setTimeout(() => {
+                    currentCharacterIndex = 0;
+                    updateCarousel(false);
+                    isAnimating = false;
+                }, 520);
+            } else {
+                currentCharacterIndex++;
+                list.style.transition = 'transform 0.5s ease';
+                updateCarousel(true);
+                setTimeout(() => { isAnimating = false; }, 520);
+            }
+        }
+
+        // キャラ選択（旧関数は削除）
+        function selectCharacter(id) {
+            selectedCharacter = characters.find(c => c.id === id);
+        }
+
+        // 敵登場アニメーション
+        function showEnemyIntro(character, callback) {
+            const overlay = document.getElementById('enemyIntroOverlay');
+            const card = document.getElementById('enemyIntroCard');
+            const img = document.getElementById('enemyIntroImg');
+            const name = document.getElementById('enemyIntroName');
+
+            img.src = character.imageUp || character.image;
+            name.textContent = character.name;
+
+            overlay.style.display = 'flex';
+            card.style.transition = 'none';
+            card.style.transform = 'translateX(110vw)';
+
+            // 右から中央へ
+            requestAnimationFrame(() => {
+                requestAnimationFrame(() => {
+                    card.style.transition = 'transform 0.55s cubic-bezier(0.22,0.61,0.36,1)';
+                    card.style.transform = 'translateX(0)';
+                });
+            });
+
+            // 中央で止まる（0.8秒）→ 左へ流れる
+            setTimeout(() => {
+                card.style.transition = 'transform 0.45s cubic-bezier(0.55,0,0.85,0.5)';
+                card.style.transform = 'translateX(-110vw)';
+            }, 1350);
+
+            // オーバーレイ非表示してコールバック
+            setTimeout(() => {
+                overlay.style.display = 'none';
+                card.style.transform = 'translateX(110vw)';
+                if (callback) callback();
+            }, 1850);
+        }
+
+        // バトル開始
+        function startBattle() {
+            if (!selectedCharacter) return;
+
+            // GA4: ゲーム開始イベント
+            gtag('event', 'game_start', {
+                character_name: selectedCharacter.name,
+                character_id: selectedCharacter.id
+            });
+
+            // GA4: キャラクター選択イベント
+            gtag('event', 'character_select', {
+                character_name: selectedCharacter.name,
+                character_id: selectedCharacter.id,
+                character_job: selectedCharacter.job
+            });
+
+            // ランダムに敵を選択
+            const availableEnemies = characters.filter(c => c.id !== selectedCharacter.id);
+            enemyCharacter = availableEnemies[Math.floor(Math.random() * availableEnemies.length)];
+
+            // 星カウント初期化
+            playerWins = 0;
+            enemyWins = 0;
+            roundCount = 0;
+
+            // 画面切り替え
+            document.getElementById('characterSelectScreen').style.display = 'none';
+            document.getElementById('battleScreen').classList.add('active');
+            // バトル画面の難易度ラベル更新
+            const bdl = document.getElementById('battleDiffLabel');
+            if (bdl) bdl.textContent = '難易度：' + (diffLabels[currentDifficulty] || '平');
+            const mdl = document.getElementById('mobileDiffLabel');
+            if (mdl) mdl.textContent = '難易度：' + (diffLabels[currentDifficulty] || '平');
+            syncMobileBar();
+            // se_btlstartのSEが終わってからバトルBGMを開始
+            const seEl = document.getElementById('se_btlstart');
+            if (seEl) {
+                seEl.addEventListener('ended', () => {
+                    _bgmResumeTarget = null;
+                    playBattleBgm();
+                }, { once: true });
+            } else {
+                playBattleBgm();
+            }
+
+            // キャラ情報表示
+            document.getElementById('playerImage').src = selectedCharacter.imageUp || selectedCharacter.image;
+            document.getElementById('playerName').textContent = selectedCharacter.name;
+            document.getElementById('playerJob').textContent = selectedCharacter.job;
+            document.getElementById('playerSkill').innerHTML = `【特技】<span style="color:#ffd700; font-size:0.95em;">「${selectedCharacter.skillName}」</span><br>${selectedCharacter.skill}`;
+            document.getElementById('enemyImage').src = enemyCharacter.imageUp || enemyCharacter.image;
+            document.getElementById('enemyName').textContent = enemyCharacter.name;
+            document.getElementById('enemyJob').textContent = enemyCharacter.job;
+            document.getElementById('enemySkill').innerHTML = `【特技】<span style="color:#ffd700; font-size:0.95em;">「${enemyCharacter.skillName}」</span><br>${enemyCharacter.skill}`;
+
+            // 星表示初期化
+            updateStars();
+
+            // バトルログ初期化
+            battleLog = [];
+            addLog(`${selectedCharacter.name} VS ${enemyCharacter.name}！`);
+            addLog('★2つ先取で勝利！');
+            addLog('');
+
+            // 敵登場アニメーション → ラウンド開始
+            showEnemyIntro(enemyCharacter, () => startRound());
+        }
+
+        // ラウンド開始
+        function startRound() {
+            roundCount++;
+            addLog(`--- ラウンド${roundCount} ---`);
+            addLog('');
+            playerHasExchanged = false;
+            
+            createDeck();
+            
+            // 難易度による交換回数
+            const baseExchange = (currentDifficulty === 'easy') ? 2 : 1;
+            exchangeRemaining = baseExchange;
+            if (selectedCharacter.skillType === 'extraExchange') exchangeRemaining = baseExchange + 1;
+            if (selectedCharacter.skillType === 'threeExchange') exchangeRemaining = baseExchange + 1;
+            
+            updateExchangeCount();
+            dealCards();
+
+            document.getElementById('exchangeButton').disabled = false;
+            document.getElementById('showdownButton').disabled = false;
+            syncBtns();
+            // 敵の挑戦：相手の手札に役がある時だけ発動（10%の確率）
+            const enemyPreview = evaluateHand(enemyHand, enemyCharacter);
+            if (Math.random() < 0.1 && enemyPreview.rank >= 1) {
+                setTimeout(() => showEnemyChallenge(), 800);
+            }
+        }
+
+        // 敵の挑戦表示
+        function showEnemyChallenge() {
+            const canReject = playerHasExchanged;
+            document.getElementById('challengeMessage').textContent =
+                `${enemyCharacter.name}が勝負を挑んできた！${canReject ? 'このまま受けるか、断って交換を続けるか？' : '（まだ交換していないため断れない）'}`;
+            document.getElementById('rejectButton').disabled = !canReject;
+            document.getElementById('rejectButton').style.opacity = canReject ? '1' : '0.4';
+            document.getElementById('challengeOverlay').classList.add('show');
+        }
+
+        // 挑戦を受ける
+        function acceptChallenge() {
+            document.getElementById('challengeOverlay').classList.remove('show');
+            document.getElementById('exchangeButton').disabled = true;
+            showdown();
+        }
+
+        // 挑戦を断る
+        function rejectChallenge() {
+            document.getElementById('challengeOverlay').classList.remove('show');
+            // 交換・勝負ボタンはそのまま有効
+        }
+
+        // デッキ作成（前回と同じ）
+        function createDeck() {
+            deck = [];
+            const suits = ['♠', '♥', '♦', '♣'];
+            const ranks = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'];
+            
+            suits.forEach(suit => {
+                ranks.forEach(rank => {
+                    deck.push({ suit, rank, value: ranks.indexOf(rank) + 1 });
+                });
+            });
+
+            if (selectedCharacter.skillType === 'joker') {
+                deck.push({ suit: '🃏', rank: 'Joker', value: 14 });
+            }
+
+            for (let i = deck.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [deck[i], deck[j]] = [deck[j], deck[i]];
+            }
+        }
+
+        // カード配布
+        function dealCards() {
+            playerHand = [];
+            enemyHand = [];
+
+            const playerCardCount = selectedCharacter.skillType === 'extraCard' ? 6 : 5;
+            const enemyCardCount = enemyCharacter.skillType === 'extraCard' ? 6 : 5;
+
+            for (let i = 0; i < playerCardCount; i++) {
+                playerHand.push(deck.pop());
+            }
+            for (let i = 0; i < enemyCardCount; i++) {
+                enemyHand.push(deck.pop());
+            }
+
+            // 同じ数字が隣り合うようにソート（ペアが見やすい）
+            playerHand.sort((a, b) => a.value - b.value);
+
+            selectedCards = [];
+            renderHands();
+        }
+
+        // 手札描画
+        function renderHands() {
+            // プレイヤーの手札
+            const playerCardsEl = document.getElementById('playerCards');
+            playerCardsEl.innerHTML = '';
+            playerHand.forEach((card, index) => {
+                const cardEl = createCardElement(card, index, true);
+                playerCardsEl.appendChild(cardEl);
+            });
+
+            // 相手の手札（裏向き）
+            const enemyCardsEl = document.getElementById('enemyCards');
+            enemyCardsEl.innerHTML = '';
+            enemyHand.forEach(() => {
+                const cardEl = document.createElement('div');
+                cardEl.className = 'card card-back';
+                cardEl.innerHTML = `
+                <svg viewBox="0 0 70 95" xmlns="http://www.w3.org/2000/svg">
+                  <defs>
+                    <linearGradient id="bgG" x1="0%" y1="0%" x2="100%" y2="100%">
+                      <stop offset="0%" style="stop-color:#0c0c0e"/>
+                      <stop offset="100%" style="stop-color:#060608"/>
+                    </linearGradient>
+                    <linearGradient id="auG" x1="0%" y1="0%" x2="100%" y2="100%">
+                      <stop offset="0%" style="stop-color:#d4a84b"/>
+                      <stop offset="50%" style="stop-color:#f5d060"/>
+                      <stop offset="100%" style="stop-color:#b08030"/>
+                    </linearGradient>
+                    <!-- 青海波パターン -->
+                    <pattern id="seigaiha" x="0" y="0" width="10" height="8" patternUnits="userSpaceOnUse">
+                      <path d="M0,8 Q5,0 10,8" fill="none" stroke="url(#auG)" stroke-width="0.4" opacity="0.35"/>
+                      <path d="M-5,4 Q0,-4 5,4" fill="none" stroke="url(#auG)" stroke-width="0.4" opacity="0.35"/>
+                      <path d="M5,4 Q10,-4 15,4" fill="none" stroke="url(#auG)" stroke-width="0.4" opacity="0.35"/>
+                    </pattern>
+                  </defs>
+
+                  <!-- 背景 -->
+                  <rect width="70" height="95" fill="url(#bgG)"/>
+
+                  <!-- 青海波の地模様 -->
+                  <rect width="70" height="95" fill="url(#seigaiha)"/>
+
+                  <!-- 外枠 二重 -->
+                  <rect x="2.5" y="2.5" width="65" height="90" fill="none" stroke="url(#auG)" stroke-width="1" rx="1"/>
+                  <rect x="5" y="5" width="60" height="85" fill="none" stroke="url(#auG)" stroke-width="0.4" rx="1" opacity="0.5"/>
+
+                  <!-- 四隅 卍崩し -->
+                  <g stroke="url(#auG)" stroke-width="0.8" fill="none" opacity="0.9">
+                    <!-- 左上 -->
+                    <polyline points="5,11 5,5 11,5"/>
+                    <polyline points="5,8 8,8 8,5"/>
+                    <!-- 右上 -->
+                    <polyline points="59,5 65,5 65,11"/>
+                    <polyline points="62,5 62,8 65,8"/>
+                    <!-- 左下 -->
+                    <polyline points="5,84 5,90 11,90"/>
+                    <polyline points="5,87 8,87 8,90"/>
+                    <!-- 右下 -->
+                    <polyline points="65,84 65,90 59,90"/>
+                    <polyline points="62,90 62,87 65,87"/>
+                  </g>
+
+                  <!-- 中央 家紋風円 -->
+                  <circle cx="35" cy="47.5" r="20" fill="none" stroke="url(#auG)" stroke-width="0.7" opacity="0.8"/>
+                  <circle cx="35" cy="47.5" r="17.5" fill="none" stroke="url(#auG)" stroke-width="0.3" opacity="0.4"/>
+
+                  <!-- 家紋：抱き茗荷（みょうが）風 -->
+                  <!-- 上の葉 -->
+                  <path d="M35,30 Q29,35 29,42 Q29,47 35,48 Q41,47 41,42 Q41,35 35,30 Z"
+                        fill="none" stroke="url(#auG)" stroke-width="0.9" opacity="0.95"/>
+                  <!-- 上の葉の中脈 -->
+                  <line x1="35" y1="31" x2="35" y2="47" stroke="url(#auG)" stroke-width="0.5" opacity="0.7"/>
+                  <!-- 下の葉 -->
+                  <path d="M35,65 Q29,60 29,53 Q29,48 35,47 Q41,48 41,53 Q41,60 35,65 Z"
+                        fill="none" stroke="url(#auG)" stroke-width="0.9" opacity="0.95"/>
+                  <!-- 下の葉の中脈 -->
+                  <line x1="35" y1="64" x2="35" y2="48" stroke="url(#auG)" stroke-width="0.5" opacity="0.7"/>
+
+                  <!-- 家紋の外側 小菱形4つ -->
+                  <g fill="url(#auG)" opacity="0.7">
+                    <polygon points="35,27 37,29.5 35,32 33,29.5"/>
+                    <polygon points="35,63 37,65.5 35,68 33,65.5"/>
+                    <polygon points="16,47.5 18.5,45.5 21,47.5 18.5,49.5"/>
+                    <polygon points="49,47.5 51.5,45.5 54,47.5 51.5,49.5"/>
+                  </g>
+
+                  <!-- 上下の横紋（亀甲風ライン） -->
+                  <g stroke="url(#auG)" stroke-width="0.5" opacity="0.5">
+                    <line x1="8" y1="18" x2="62" y2="18"/>
+                    <line x1="8" y1="77" x2="62" y2="77"/>
+                  </g>
+                  <!-- 亀甲ライン上の小菱形 -->
+                  <g fill="url(#auG)" opacity="0.6">
+                    <polygon points="35,15 37,18 35,21 33,18"/>
+                    <polygon points="35,74 37,77 35,80 33,77"/>
+                  </g>
+
+                  <!-- 上段 小紋（桜） -->
+                  <g fill="url(#auG)" opacity="0.55" font-family="serif">
+                    <text x="15" y="16" font-size="5" text-anchor="middle">✿</text>
+                    <text x="55" y="16" font-size="5" text-anchor="middle">✿</text>
+                    <text x="15" y="79" font-size="5" text-anchor="middle">✿</text>
+                    <text x="55" y="79" font-size="5" text-anchor="middle">✿</text>
+                  </g>
+                </svg>`;
+                enemyCardsEl.appendChild(cardEl);
+            });
+        }
+
+        // カード要素作成
+        function createCardElement(card, index, clickable) {
+            const cardEl = document.createElement('div');
+            const color = (card.suit === '♥' || card.suit === '♦') ? 'red' : 'black';
+            cardEl.className = `card ${color}`;
+            if (selectedCards.includes(index)) {
+                cardEl.classList.add('selected');
+            }
+            
+            if (clickable) {
+                cardEl.onclick = () => toggleCardSelection(index);
+            }
+
+            cardEl.innerHTML = `
+                <div class="card-suit">${card.suit}</div>
+                <div class="card-rank">${card.rank}</div>
+            `;
+            
+            return cardEl;
+        }
+
+        // カード選択切替
+        function toggleCardSelection(index) {
+            const idx = selectedCards.indexOf(index);
+            if (idx > -1) {
+                selectedCards.splice(idx, 1);
+            } else {
+                selectedCards.push(index);
+            }
+            renderHands();
+        }
+
+        // カード交換
+        function exchangeCards() {
+            if (exchangeRemaining <= 0) {
+                return;
+            }
+
+            if (selectedCards.length === 0) {
+                return;
+            }
+
+            selectedCards.sort((a, b) => b - a);
+            selectedCards.forEach(index => {
+                playerHand.splice(index, 1);
+                playerHand.push(deck.pop());
+            });
+
+            // 交換後もソート
+            playerHand.sort((a, b) => a.value - b.value);
+
+            addLog(`${selectedCards.length}枚のカードを交換しました`);
+            
+            selectedCards = [];
+            exchangeRemaining--;
+            playerHasExchanged = true;
+            updateExchangeCount();
+
+            if (exchangeRemaining === 0) {
+                document.getElementById('exchangeButton').disabled = true;
+                syncBtns();
+            }
+
+            renderHands();
+        }
+
+        // スマホ判定
+        function isMobile() { return window.innerWidth <= 600; }
+
+        // モバイルアクションバーの表示制御
+        function syncMobileBar() {
+            const bar = document.getElementById('mobileActionBar');
+            const battleActive = document.getElementById('battleScreen').classList.contains('active');
+            bar.style.display = (isMobile() && battleActive) ? 'flex' : 'none';
+        }
+        window.addEventListener('resize', syncMobileBar);
+
+        // ボタンdisabled同期
+        function syncBtns() {
+            const exDis = document.getElementById('exchangeButton').disabled;
+            const shDis = document.getElementById('showdownButton').disabled;
+            document.getElementById('mobileExchangeBtn').disabled = exDis;
+            document.getElementById('mobileShowdownBtn').disabled = shDis;
+        }
+
+        // 交換回数更新
+        function updateExchangeCount() {
+            document.getElementById('exchangeCount').textContent = exchangeRemaining;
+            document.getElementById('exchangeCountMobile').textContent = exchangeRemaining;
+        }
+
+        // 勝負
+        function showdown() {
+            document.getElementById('exchangeButton').disabled = true;
+            document.getElementById('showdownButton').disabled = true;
+            syncBtns();
+
+            // 相手もカード交換（難易度によりAI分岐）
+            const enemyDiscardIndices = getEnemyDiscardIndices(enemyHand, enemyCharacter, currentDifficulty);
+            enemyDiscardIndices.sort((a, b) => b - a).forEach(i => {
+                enemyHand.splice(i, 1);
+                enemyHand.push(deck.pop());
+            });
+
+            // 相手の手札を表示
+            const enemyCardsEl = document.getElementById('enemyCards');
+            enemyCardsEl.innerHTML = '';
+            enemyHand.forEach((card) => {
+                const cardEl = createCardElement(card, 0, false);
+                enemyCardsEl.appendChild(cardEl);
+            });
+
+            // 役判定
+            const playerResult = evaluateHand(playerHand, selectedCharacter);
+            const enemyResult = evaluateHand(enemyHand, enemyCharacter);
+
+            addLog('');
+            addLog(`あなたの役: ${playerResult.name} (威力: ${playerResult.damage})`);
+            addLog(`相手の役: ${enemyResult.name} (威力: ${enemyResult.damage})`);
+            addLog('');
+
+            // 勝敗判定
+            determineWinner(playerResult, enemyResult);
+        }
+
+        // 敵AI：難易度に応じて捨てるカードのインデックスを返す
+        function getEnemyDiscardIndices(hand, character, difficulty) {
+            // かんたん：完全ランダム（0〜2枚）
+            if (difficulty === 'easy') {
+                const count = Math.floor(Math.random() * 3);
+                const indices = hand.map((_, i) => i);
+                // シャッフルして先頭count枚
+                for (let i = indices.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [indices[i], indices[j]] = [indices[j], indices[i]];
+                }
+                return indices.slice(0, count);
+            }
+
+            const values = hand.map(c => c.value);
+            const suits  = hand.map(c => c.suit);
+            const valueCounts = {};
+            values.forEach(v => valueCounts[v] = (valueCounts[v] || 0) + 1);
+            const counts = Object.values(valueCounts).sort((a, b) => b - a);
+
+            // むずかしい：フラッシュ・ストレート狙いも含む
+            if (difficulty === 'hard') {
+                // フラッシュ狙い：同スート4枚以上
+                const suitCounts = {};
+                suits.forEach(s => suitCounts[s] = (suitCounts[s] || 0) + 1);
+                const dominantSuit = Object.entries(suitCounts).sort((a, b) => b[1] - a[1])[0];
+                if (dominantSuit[1] >= 4) {
+                    const discards = [];
+                    hand.forEach((c, i) => { if (c.suit !== dominantSuit[0]) discards.push(i); });
+                    return discards.slice(0, 1);
+                }
+                // ストレート狙い：連続4枚
+                const sortedVals = [...new Set(values)].sort((a, b) => a - b);
+                let maxSeq = 1, seqCount = 1, seqEnd = sortedVals[0];
+                for (let i = 1; i < sortedVals.length; i++) {
+                    if (sortedVals[i] === sortedVals[i-1] + 1) {
+                        seqCount++;
+                        if (seqCount > maxSeq) { maxSeq = seqCount; seqEnd = sortedVals[i]; }
+                    } else { seqCount = 1; }
+                }
+                if (maxSeq >= 4) {
+                    const seqNums = new Set();
+                    for (let v = seqEnd - maxSeq + 1; v <= seqEnd; v++) seqNums.add(v);
+                    const discards = [];
+                    hand.forEach((c, i) => { if (!seqNums.has(c.value)) discards.push(i); });
+                    return discards.slice(0, 1);
+                }
+            }
+
+            // ふつう・むずかしい共通：ペア以上を残して交換
+            if (counts[0] >= 4) return []; // フォーカード：交換なし
+            if (counts[0] === 3 && counts[1] === 2) return []; // フルハウス：交換なし
+
+            const keepValues = new Set();
+            Object.entries(valueCounts).forEach(([v, cnt]) => { if (cnt >= 2) keepValues.add(Number(v)); });
+            const discards = hand.map((c, i) => keepValues.has(c.value) ? null : i).filter(i => i !== null);
+
+            if (counts[0] === 3) return discards.slice(0, 1); // スリーカード：1枚だけ捨てる
+            if (counts[0] === 2 && counts[1] === 2) return discards.slice(0, 1); // ツーペア：1枚捨てる
+            if (counts[0] === 2) return discards.slice(0, 2); // ワンペア：2枚捨てる
+
+            // ノーペア：低い2枚を捨てる（Aは14扱いで残す）
+            const withIdx = hand.map((c, i) => ({ v: c.value === 1 ? 14 : c.value, i }))
+                .sort((a, b) => a.v - b.v);
+            return withIdx.slice(0, 2).map(x => x.i);
+        }
+
+        // 役の評価
+        function evaluateHand(hand, character) {
+            const result = checkPokerHand(hand);
+            let damage = result.baseDamage;
+            let rank = result.rank;
+            let name = result.name;
+            
+            // 花魁の特技：♥が3枚以上なら役が1ランクアップ
+            if (character.skillType === 'wildHearts') {
+                const heartCount = hand.filter(card => card.suit === '♥').length;
+                if (heartCount >= 3) {
+                    rank += 1; // ランクを上げる
+                    // ランクアップ後の役名を表示
+                    const rankUpNames = [
+                        'ノーペア', 'ワンペア', 'ツーペア', 'スリーカード', 
+                        'ストレート', 'フラッシュ', 'フルハウス', 'フォーカード', 
+                        'ストレートフラッシュ', 'ロイヤルストレートフラッシュ'
+                    ];
+                    const newRankName = rankUpNames[rank] || 'MAX';
+                    name = `${name} → ${newRankName}にランクアップ！`;
+                    
+                    // ダメージも上げる
+                    const damageTable = [5, 10, 15, 20, 25, 30, 35, 45, 60, 100];
+                    damage = damageTable[rank] || 100;
+                }
+            }
+            
+            switch(character.skillType) {
+                case 'flushBoost':
+                    if (name.includes('フラッシュ')) damage += 10;
+                    break;
+                case 'straightBoost':
+                    if (name.includes('ストレート')) damage += 15;
+                    break;
+                case 'pairBoost':
+                    if (name.includes('ペア') || name.includes('スリー') || name.includes('フォー')) damage += 5;
+                    break;
+                case 'highHandBoost':
+                    if (rank >= 7) damage += 20;
+                    break;
+                case 'allBoost':
+                    damage += 5;
+                    break;
+                case 'nullifyLoss':
+                    // 勝敗判定で処理
+                    break;
+            }
+
+            return { ...result, name, damage, rank };
+        }
+
+        // ポーカー役判定
+        // 5枚の組み合わせから最良の役を選ぶ
+        function checkPokerHand(hand) {
+            // 6枚の場合はベスト5枚を探す（1枚ずつ除いてC(6,5)=6通り）
+            if (hand.length > 5) {
+                let best = null;
+                for (let i = 0; i < hand.length; i++) {
+                    const five = hand.filter((_, idx) => idx !== i);
+                    const result = evaluateFiveCards(five);
+                    if (!best || result.rank > best.rank) best = result;
+                }
+                return best;
+            }
+            return evaluateFiveCards(hand);
+        }
+
+        function evaluateFiveCards(hand) {
+            const ranks = hand.map(c => c.value).sort((a, b) => a - b);
+            const suits = hand.map(c => c.suit);
+            
+            const rankCounts = {};
+            ranks.forEach(r => rankCounts[r] = (rankCounts[r] || 0) + 1);
+            const counts = Object.values(rankCounts).sort((a, b) => b - a);
+            
+            const isFlush = new Set(suits).size === 1;
+
+            // ストレート判定（A=1を14として扱うA-high対応）
+            const isNormalStraight = ranks.every((rank, i) => i === 0 || rank === ranks[i-1] + 1);
+            // A-high straight: A(1),10,J,Q,K → values [1,10,11,12,13]
+            const isAHighStraight = ranks[0] === 1 && ranks[1] === 10 && ranks[2] === 11 && ranks[3] === 12 && ranks[4] === 13;
+            const isStraight = isNormalStraight || isAHighStraight;
+
+            // ロイヤルストレートフラッシュ: A,10,J,Q,K の同スーツ
+            if (isFlush && isAHighStraight) {
+                return { name: 'ロイヤルストレートフラッシュ', baseDamage: 100, rank: 9 };
+            }
+            // 旧ロイヤル判定（10始まりの通常ストレートフラッシュ）
+            if (isFlush && isNormalStraight && ranks[0] === 10) {
+                return { name: 'ロイヤルストレートフラッシュ', baseDamage: 100, rank: 9 };
+            }
+            if (isFlush && isStraight) {
+                return { name: 'ストレートフラッシュ', baseDamage: 60, rank: 8 };
+            }
+            if (counts[0] === 4) {
+                return { name: 'フォーカード', baseDamage: 45, rank: 7 };
+            }
+            if (counts[0] === 3 && counts[1] === 2) {
+                return { name: 'フルハウス', baseDamage: 35, rank: 6 };
+            }
+            if (isFlush) {
+                return { name: 'フラッシュ', baseDamage: 30, rank: 5 };
+            }
+            if (isStraight) {
+                return { name: 'ストレート', baseDamage: 25, rank: 4 };
+            }
+            if (counts[0] === 3) {
+                return { name: 'スリーカード', baseDamage: 20, rank: 3 };
+            }
+            if (counts[0] === 2 && counts[1] === 2) {
+                return { name: 'ツーペア', baseDamage: 15, rank: 2 };
+            }
+            if (counts[0] === 2) {
+                return { name: 'ワンペア', baseDamage: 10, rank: 1 };
+            }
+            return { name: 'ノーペア', baseDamage: 5, rank: 0 };
+        }
+
+        // 勝敗判定
+        function determineWinner(playerResult, enemyResult) {
+            let winner = null;
+
+            if (playerResult.rank === enemyResult.rank) {
+                if (selectedCharacter.skillType === 'drawWin') {
+                    winner = 'player';
+                    addLog('【特技発動】引き分けの場合必ず勝利！');
+                } else if (enemyCharacter.skillType === 'drawWin') {
+                    winner = 'enemy';
+                    addLog('【相手特技発動】引き分けの場合必ず勝利！');
+                } else {
+                    winner = 'draw';
+                }
+            } else {
+                if (playerResult.rank > enemyResult.rank) {
+                    winner = 'player';
+                } else {
+                    winner = 'enemy';
+                }
+            }
+
+            addLog('');
+            
+            // 星が実際に増えたか判定用（加算前に取得）
+            const playerWinsSnapshot = playerWins;
+
+            // ラウンド勝敗
+            if (winner === 'player') {
+                // 敵が竜之介なら敵の負けを1回無効化
+                if (enemyCharacter.skillType === 'nullifyLoss' && !enemyNullifyUsed) {
+                    enemyNullifyUsed = true;
+                    roundCount--; // このラウンドをなかったことに
+                    addLog('【相手特技発動】火消しが敗北を食い止めた！\nこのラウンドは無効！');
+                } else {
+                    playerWins++;
+                    addLog(`${selectedCharacter.name}がこのラウンドを制した！★獲得！`);
+                }
+            } else if (winner === 'enemy') {
+                // プレイヤーが竜之介なら負けを1回無効化
+                if (selectedCharacter.skillType === 'nullifyLoss' && !playerNullifyUsed) {
+                    playerNullifyUsed = true;
+                    roundCount--; // このラウンドをなかったことに
+                    addLog('【特技発動】火消しが敗北を食い止めた！\nこのラウンドは無効！');
+                } else {
+                    enemyWins++;
+                    addLog(`${enemyCharacter.name}がこのラウンドを制した！★獲得！`);
+                }
+            } else {
+                addLog('引き分け！どちらも★を獲得できず！');
+            }
+
+            addLog(`現在のスコア - あなた:${playerWins}★ 相手:${enemyWins}★`);
+            addLog('');
+
+            updateStars();
+
+            // 勝利条件判定
+            let gameOver = false;
+            let finalWinner = null;
+
+            if (playerWins >= 2) {
+                gameOver = true;
+                finalWinner = 'player';
+            } else if (enemyWins >= 2) {
+                gameOver = true;
+                finalWinner = 'enemy';
+            }
+
+            // ポップアップ表示
+            if (gameOver) {
+                if (finalWinner === 'player') {
+                    showPopup(true);
+                } else if (finalWinner === 'enemy') {
+                    showPopup(false);
+                } else {
+                    showPopup('draw');
+                }
+            } else {
+                // 途中ラウンドで自分の星が入った場合にSE再生
+                if (playerWins > playerWinsSnapshot) {
+                    playSound('se_star');
+                }
+                showPopup(null);
+            }
+        }
+
+        // 星表示更新
+        function updateStars() {
+            const playerStarsEl = document.getElementById('playerStars');
+            const enemyStarsEl = document.getElementById('enemyStars');
+
+            playerStarsEl.innerHTML = '';
+            enemyStarsEl.innerHTML = '';
+
+            // プレイヤーの星
+            for (let i = 0; i < 2; i++) {
+                const star = document.createElement('span');
+                star.className = i < playerWins ? 'star' : 'star empty';
+                star.textContent = '★';
+                playerStarsEl.appendChild(star);
+            }
+
+            // 相手の星
+            for (let i = 0; i < 2; i++) {
+                const star = document.createElement('span');
+                star.className = i < enemyWins ? 'star' : 'star empty';
+                star.textContent = '★';
+                enemyStarsEl.appendChild(star);
+            }
+        }
+
+        // バトルログ追加
+        function addLog(text) {
+            battleLog.push(text);
+        }
+
+        // ポップアップ表示
+        function showPopup(isWin) {
+            // 途中ラウンド（isWin === null）はSE終了を待たずBGMを即再開
+            if (isWin === null) {
+                if (_bgmResumeTarget && _bgmResumeTarget.paused && bgmEnabled) {
+                    _bgmResumeTarget.play().catch(() => {});
+                }
+                _bgmResumeTarget = null;
+            }
+
+            const popupContent = document.getElementById('popupContent');
+            popupContent.innerHTML = '';
+
+            // battleLogからキー情報を抽出
+            const logText = battleLog.join('\n');
+
+            // 役テキスト抽出
+            const playerRoleLine = battleLog.find(l => l.startsWith('あなたの役:'));
+            const enemyRoleLine = battleLog.find(l => l.startsWith('相手の役:'));
+
+            // ラウンドタイトル
+            const roundLine = battleLog.find(l => l.startsWith('--- ラウンド') || l.includes('VS'));
+
+            // 能力発動フラグ（skillTypeごとに正しく判定）
+            const playerAbilityFired = (() => {
+                switch (selectedCharacter.skillType) {
+                    case 'wildHearts':  return playerRoleLine && playerRoleLine.includes('ランクアップ');
+                    case 'drawWin':     return battleLog.some(l => l.includes('【特技発動】') && l.includes('引き分け'));
+                    case 'nullifyLoss': return battleLog.some(l => l.includes('【特技発動】') && l.includes('無効'));
+                    default:            return battleLog.some(l => l.includes('【特技発動】'));
+                }
+            })();
+            const enemyAbilityFired = (() => {
+                switch (enemyCharacter.skillType) {
+                    case 'wildHearts':  return battleLog.find(l => l.startsWith('相手の役:')) && battleLog.find(l => l.startsWith('相手の役:')).includes('ランクアップ');
+                    case 'drawWin':     return battleLog.some(l => l.includes('【相手特技発動】') && l.includes('引き分け'));
+                    case 'nullifyLoss': return battleLog.some(l => l.includes('【相手特技発動】') && l.includes('無効'));
+                    default:            return battleLog.some(l => l.includes('【相手特技発動】'));
+                }
+            })();
+
+            // 構造化コンテンツ生成
+            const sections = [];
+
+            // 対戦見出し
+            if (roundLine) {
+                const heading = document.createElement('div');
+                heading.style.cssText = 'text-align:center; color:#c9a870; font-size:0.9em; margin-bottom:12px; letter-spacing:0.1em;';
+                heading.textContent = roundLine;
+                popupContent.appendChild(heading);
+            }
+
+            // 勝敗結果（見出し直下）
+            if (isWin === true) {
+                playSound('se_win');
+                // GA4: 勝利イベント
+                gtag('event', 'battle_result', {
+                    result: 'win',
+                    character_name: selectedCharacter.name,
+                    enemy_name: enemyCharacter.name,
+                    round_count: roundCount
+                });
+                const resultDiv = document.createElement('div');
+                resultDiv.className = 'result-text win';
+                resultDiv.textContent = '🎉 勝利！ 🎉';
+                popupContent.appendChild(resultDiv);
+                document.getElementById('popupButton').textContent = '次の対戦相手へ';
+                document.getElementById('popupButton').onclick = () => { playSound('se_btm'); nextBattle(); };
+            } else if (isWin === false) {
+                playSound('se_lose');
+                // GA4: 敗北イベント
+                gtag('event', 'battle_result', {
+                    result: 'lose',
+                    character_name: selectedCharacter.name,
+                    enemy_name: enemyCharacter.name,
+                    round_count: roundCount
+                });
+                const resultDiv = document.createElement('div');
+                resultDiv.className = 'result-text lose';
+                resultDiv.textContent = '💀 敗北... 💀';
+                popupContent.appendChild(resultDiv);
+                document.getElementById('popupButton').textContent = '次の対戦相手へ';
+                document.getElementById('popupButton').onclick = () => { playSound('se_btm'); nextBattle(); };
+            } else if (isWin === 'draw') {
+                // GA4: 引き分けイベント
+                gtag('event', 'battle_result', {
+                    result: 'draw',
+                    character_name: selectedCharacter.name,
+                    enemy_name: enemyCharacter.name,
+                    round_count: roundCount
+                });
+                const resultDiv = document.createElement('div');
+                resultDiv.className = 'result-text';
+                resultDiv.textContent = '⚔️ 引き分け ⚔️';
+                popupContent.appendChild(resultDiv);
+                document.getElementById('popupButton').textContent = '次の対戦相手へ';
+                document.getElementById('popupButton').onclick = () => { playSound('se_btm'); nextBattle(); };
+            } else {
+                // 途中ラウンド：ラウンド結果を見出し直下に表示
+                const roundResultLines = battleLog.filter(l =>
+                    l.includes('を制した') || l.includes('引き分け') || l.includes('無効')
+                );
+                roundResultLines.forEach(l => {
+                    const rr = document.createElement('div');
+                    rr.style.cssText = 'text-align:center; color:#ffd700; font-size:1em; font-weight:bold; margin-bottom:10px;';
+                    rr.innerHTML = l.replace(/\n/g, '<br>');
+                    popupContent.appendChild(rr);
+                });
+                document.getElementById('popupButton').textContent = '次のラウンドへ';
+                document.getElementById('popupButton').onclick = () => { playSound('se_btm'); closePopup(); };
+            }
+
+            // 勝敗確定時：ラウンド結果を勝敗テキストの直下に表示
+            if (isWin !== null) {
+                const roundResultLines = battleLog.filter(l =>
+                    l.includes('を制した') || l.includes('引き分け') || l.includes('無効')
+                );
+                roundResultLines.forEach(l => {
+                    const rr = document.createElement('div');
+                    rr.style.cssText = 'text-align:center; color:#c9a870; font-size:0.88em; margin-bottom:10px;';
+                    rr.innerHTML = l.replace(/\n/g, '<br>');
+                    popupContent.appendChild(rr);
+                });
+            }
+
+            // 能力発動
+            const abilitySection = document.createElement('div');
+            abilitySection.style.cssText = 'background:rgba(255,215,0,0.08); border:1px solid rgba(255,215,0,0.3); border-radius:8px; padding:10px 14px; margin-bottom:10px;';
+            abilitySection.innerHTML = `<div style="color:#ffd700; font-weight:bold; margin-bottom:6px; font-size:0.95em;">⚔ 能力発動</div>`;
+            if (playerAbilityFired || enemyAbilityFired) {
+                if (playerAbilityFired) {
+                    const nm = document.createElement('div');
+                    nm.style.cssText = 'color:#ffd700; font-size:0.9em; font-weight:bold; margin-bottom:2px;';
+                    nm.textContent = `「${selectedCharacter.skillName}」`;
+                    const sk = document.createElement('div');
+                    sk.style.cssText = 'color:#ffe07a; font-size:0.85em; line-height:1.6; margin-bottom:8px;';
+                    sk.textContent = selectedCharacter.skill;
+                    abilitySection.appendChild(nm);
+                    abilitySection.appendChild(sk);
+                }
+                if (enemyAbilityFired) {
+                    const nm = document.createElement('div');
+                    nm.style.cssText = 'color:#ffaa44; font-size:0.9em; font-weight:bold; margin-bottom:2px;';
+                    nm.textContent = `「${enemyCharacter.skillName}」（相手）`;
+                    const sk = document.createElement('div');
+                    sk.style.cssText = 'color:#ffcc88; font-size:0.85em; line-height:1.6;';
+                    sk.textContent = enemyCharacter.skill;
+                    abilitySection.appendChild(nm);
+                    abilitySection.appendChild(sk);
+                }
+            } else {
+                const p = document.createElement('div');
+                p.style.cssText = 'color:#888; font-size:0.85em;';
+                p.textContent = 'なし';
+                abilitySection.appendChild(p);
+            }
+            popupContent.appendChild(abilitySection);
+
+            // 役
+            const handSection = document.createElement('div');
+            handSection.style.cssText = 'background:rgba(212,165,116,0.08); border:1px solid rgba(212,165,116,0.3); border-radius:8px; padding:10px 14px; margin-bottom:10px;';
+            handSection.innerHTML = `<div style="color:#d4a574; font-weight:bold; margin-bottom:6px; font-size:0.95em;">🎴 役</div>`;
+            const playerRoleEl = document.createElement('div');
+            playerRoleEl.style.cssText = 'font-size:0.9em; line-height:1.8;';
+            playerRoleEl.innerHTML = `<span style="color:#aaa;">あなた：</span><span style="color:#fff;">${playerRoleLine ? playerRoleLine.replace('あなたの役: ', '') : '—'}</span>`;
+            const enemyRoleEl = document.createElement('div');
+            enemyRoleEl.style.cssText = 'font-size:0.9em; line-height:1.8;';
+            enemyRoleEl.innerHTML = `<span style="color:#aaa;">相手：</span><span style="color:#fff;">${enemyRoleLine ? enemyRoleLine.replace('相手の役: ', '') : '—'}</span>`;
+            handSection.appendChild(playerRoleEl);
+            handSection.appendChild(enemyRoleEl);
+            popupContent.appendChild(handSection);
+
+            // 勝利条件・スコア
+            const scoreLine = battleLog.filter(l => l.includes('現在のスコア')).pop();
+            const winCondLine = battleLog.find(l => l.includes('★2つ先取'));
+            const winSection = document.createElement('div');
+            winSection.style.cssText = 'background:rgba(100,200,100,0.07); border:1px solid rgba(100,200,100,0.25); border-radius:8px; padding:10px 14px; margin-bottom:10px;';
+            winSection.innerHTML = `<div style="color:#90e090; font-weight:bold; margin-bottom:6px; font-size:0.95em;">⭐ 勝利条件</div>`;
+            if (winCondLine) {
+                const wc = document.createElement('div');
+                wc.style.cssText = 'color:#aaa; font-size:0.85em; margin-bottom:4px;';
+                wc.textContent = winCondLine;
+                winSection.appendChild(wc);
+            }
+            if (scoreLine) {
+                const sc = document.createElement('div');
+                sc.style.cssText = 'color:#e0e0e0; font-size:0.95em; font-weight:bold;';
+                sc.textContent = scoreLine.replace('現在のスコア - ', '');
+                winSection.appendChild(sc);
+            }
+            popupContent.appendChild(winSection);
+
+            document.getElementById('popupOverlay').classList.add('show');
+        }
+
+        // 次の対戦へ（同じキャラを使用）
+        function nextBattle() {
+            document.getElementById('popupOverlay').classList.remove('show');
+
+            // GA4: 続けてプレイイベント
+            gtag('event', 'continue_game', {
+                character_name: selectedCharacter.name,
+                character_id: selectedCharacter.id
+            });
+
+            // 同じキャラで新しい対戦相手を選ぶ（前回と同じ相手にならないようにする）
+            const availableEnemies = characters.filter(c => c.id !== selectedCharacter.id && c.id !== enemyCharacter.id);
+            // availableEnemiesが空の場合（キャラが2人しかいない場合）は全員から選ぶ
+            const pool = availableEnemies.length > 0 ? availableEnemies : characters.filter(c => c.id !== selectedCharacter.id);
+            enemyCharacter = pool[Math.floor(Math.random() * pool.length)];
+
+            // 星カウント初期化
+            playerWins = 0;
+            enemyWins = 0;
+            roundCount = 0;
+            playerNullifyUsed = false;
+            enemyNullifyUsed = false;
+            document.getElementById('enemyImage').src = enemyCharacter.imageUp || enemyCharacter.image;
+            document.getElementById('enemyName').textContent = enemyCharacter.name;
+            document.getElementById('enemyJob').textContent = enemyCharacter.job;
+            document.getElementById('enemySkill').innerHTML = `【特技】<span style="color:#ffd700; font-size:0.95em;">「${enemyCharacter.skillName}」</span><br>${enemyCharacter.skill}`;
+
+            // 星表示初期化
+            updateStars();
+
+            // バトルログ初期化
+            battleLog = [];
+            addLog(`${selectedCharacter.name} VS ${enemyCharacter.name}！`);
+            addLog('★2つ先取で勝利！');
+            addLog('');
+
+            // 敵登場アニメーション → 最初のラウンド開始
+            showEnemyIntro(enemyCharacter, () => setTimeout(() => startRound(), 500));
+        }
+
+        // ポップアップを閉じる
+        function closePopup() {
+            document.getElementById('popupOverlay').classList.remove('show');
+            
+            // 次のラウンドへ
+            battleLog = [];
+            setTimeout(() => startRound(), 500);
+        }
+
+        // キャラクター選択に戻る
+        // キャラクターの今日の一言
+        const characterQuotes = {
+            1: [ // 紅蓮
+                "花は散るからこそ、美しい。\n札も同じ。わっちは一瞬に賭ける。",
+                "迷うたならば、心に正直でおいでなんし。\n手札は嘘をつきやせんゆえ。",
+                "負けを恐れる者に、勝ちは来ぬ。\n腹を据えて生きなんし。"
+            ],
+            5: [ // 荒波 轟太郎
+                "引き分けなど、ない。\n俺が立てば、それが勝ちよ。",
+                "力は、持っているだけでは意味がない。\n使ってこそ、力だ。",
+                "土俵に上がった以上、退くな。\nそれだけだ。"
+            ],
+            9: [ // 月影
+                "川の流れに逆らうな。\n手札の流れも、同じことよ。",
+                "六枚あれば、六通りの流れがある。\n焦らず、見極めることじゃ。",
+                "水は低きに流れ、勝負は高きを目指す。\n矛盾の中に、道がある。"
+            ],
+            16: [ // 竜之介
+                "火は消せても、勝負の熱は消えない。\nそれでいい。",
+                "一度の敗けで全ては終わらん。\n立て直す間合いが、肝心よ。",
+                "炎は風に揺れても、消えなければ勝ちだ。"
+            ],
+            19: [ // 疾風
+                "速さは力。三度換えれば、天運も変わる。",
+                "風は止まらぬ。おぬしも、止まるな。",
+                "迷うより動け。手を換えるのは、弱さじゃない。\n賢さだ。"
+            ]
+        };
+
+        function showQuote(character) {
+            const quotes = characterQuotes[character.id];
+            const quote = quotes[Math.floor(Math.random() * quotes.length)];
+            document.getElementById('quoteCharaImage').src = character.image;
+            document.getElementById('quoteCharaName').textContent = character.name;
+            document.getElementById('quoteText').textContent = quote;
+            document.getElementById('quoteOverlay').classList.add('show');
+        }
+
+        function closeQuote() {
+            document.getElementById('quoteOverlay').classList.remove('show');
+        }
+
+        function backToCharacterSelect() {
+            document.getElementById('battleScreen').classList.remove('active');
+            document.getElementById('characterSelectScreen').style.display = 'flex';
+            syncMobileBar();
+            // se_changeのSEが終わってからセレクトBGMを開始
+            const seEl = document.getElementById('se_change');
+            if (seEl && !seEl.paused) {
+                seEl.addEventListener('ended', () => {
+                    _bgmResumeTarget = null;
+                    playSelectBgm();
+                }, { once: true });
+            } else {
+                playSelectBgm();
+            }
+            // 選んでいたキャラの一言を表示
+            if (selectedCharacter) {
+                setTimeout(() => showQuote(selectedCharacter), 300);
+            }
+        }
+
+        // 初期化実行
+        init();
+    </script>
+</body>
+</html>
