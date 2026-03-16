@@ -1548,6 +1548,9 @@
         // SE再生後にBGMを再開する対象を管理
         let _bgmResumeTarget = null;
 
+        // 現在再生中のSE要素を管理
+        const _playingSEs = new Set();
+
         function playSound(id) {
             if (!bgmEnabled) return;
             const el = document.getElementById(id);
@@ -1560,22 +1563,21 @@
                 const battleBgm = document.getElementById('battleBgm');
                 const activeBgm = !selectBgm.paused ? selectBgm : (!battleBgm.paused ? battleBgm : null);
 
-                // BGMが流れていれば止めて再開対象を更新
+                // BGMが流れていれば止めて再開対象を記録（上書きしない）
                 if (activeBgm && bgmEnabled) {
                     activeBgm.pause();
                     _bgmResumeTarget = activeBgm;
                 }
 
+                _playingSEs.add(el);
                 el.play().catch(() => {});
                 el.addEventListener('ended', () => {
-                    // 再開対象が残っていて両BGMがpausedの場合のみ再開
-                    if (_bgmResumeTarget && _bgmResumeTarget.paused && bgmEnabled) {
-                        const other = _bgmResumeTarget === selectBgm ? battleBgm : selectBgm;
-                        if (other.paused) {
-                            _bgmResumeTarget.play().catch(() => {});
-                        }
+                    _playingSEs.delete(el);
+                    // 全SEが終わった時だけBGMを再開
+                    if (_playingSEs.size === 0 && _bgmResumeTarget && _bgmResumeTarget.paused && bgmEnabled) {
+                        _bgmResumeTarget.play().catch(() => {});
+                        _bgmResumeTarget = null;
                     }
-                    _bgmResumeTarget = null;
                 }, { once: true });
                 return;
             }
