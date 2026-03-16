@@ -2063,9 +2063,10 @@
             if (mdl) mdl.textContent = '難易度：' + (diffLabels[currentDifficulty] || '平');
             syncMobileBar();
             // se_btlstartのSEが終わってからバトルBGMを開始
-            const seEl = document.getElementById('se_btlstart');
-            if (seEl) {
-                seEl.addEventListener('ended', () => {
+            // ※playSound()はcloneNode()で複製を再生するため、endedリスナーはcloneに付ける
+            const seClone = _seClones['se_btlstart'];
+            if (seClone && !seClone.ended) {
+                seClone.addEventListener('ended', () => {
                     playBattleBgm();
                 }, { once: true });
             } else {
