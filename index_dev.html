@@ -1590,11 +1590,11 @@
         }
 
         function _playSE(el) {
-            // スマホ対応：pause→currentTime=0→play の順で確実に再生
-            el.pause();
-            el.currentTime = 0;
-            const p = el.play();
-            if (p) p.catch(() => {});
+            // スマホ対応：cloneNodeで毎回新しい要素として再生
+            const clone = el.cloneNode();
+            clone.volume = 1.0;
+            clone.play().catch(() => {});
+            return clone;
         }
 
         function playSound(id) {
@@ -1618,8 +1618,8 @@
             // se_change：BGMを停止してSE再生、終了後にselectBgmを再開
             if (id === 'se_change') {
                 _stopAllBgmNow();
-                _playSE(el);
-                el.addEventListener('ended', () => {
+                const clone = _playSE(el);
+                clone.addEventListener('ended', () => {
                     playSelectBgm();
                 }, { once: true });
                 return;
@@ -1627,8 +1627,8 @@
 
             // その他SE（se_star, se_punch 等）：ダッキングして再生
             _duckBgm();
-            _playSE(el);
-            el.addEventListener('ended', () => {
+            const clone = _playSE(el);
+            clone.addEventListener('ended', () => {
                 _unduckBgm();
             }, { once: true });
         }
