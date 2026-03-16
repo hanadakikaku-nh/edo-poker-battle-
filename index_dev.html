@@ -1546,16 +1546,25 @@
         }
 
         // BGMダッキング管理（SEが鳴っている間BGMを小さくする）
-        let _duckingCount = 0;         // 現在再生中のSE数
-        let _duckTimer = null;         // 音量復元タイマー
-        const BGM_NORMAL_VOL = bgmVolume;  // 通常音量
-        const BGM_DUCK_VOL   = 0.07;       // SE中の音量
+        let _duckingCount = 0;
+        let _duckTimer = null;
+        const BGM_NORMAL_VOL = bgmVolume;
+        const BGM_DUCK_VOL   = 0.07;
+
+        // BGMを完全停止するSE
+        const SE_STOP_BGM = new Set(['se_win', 'se_lose']);
 
         function _getBgms() {
             return [
                 document.getElementById('selectBgm'),
                 document.getElementById('battleBgm')
             ];
+        }
+
+        function _stopAllBgmNow() {
+            if (_duckTimer) { clearTimeout(_duckTimer); _duckTimer = null; }
+            _duckingCount = 0;
+            _getBgms().forEach(b => { if (b) { b.pause(); b.volume = BGM_NORMAL_VOL; } });
         }
 
         function _duckBgm() {
@@ -1567,7 +1576,6 @@
         function _unduckBgm() {
             _duckingCount = Math.max(0, _duckingCount - 1);
             if (_duckingCount === 0) {
-                // 少し間を置いてから音量を戻す
                 _duckTimer = setTimeout(() => {
                     _getBgms().forEach(b => { if (b) b.volume = BGM_NORMAL_VOL; });
                     _duckTimer = null;
@@ -1579,18 +1587,40 @@
             if (!bgmEnabled) return;
             const el = document.getElementById(id);
             if (!el) return;
-            el.currentTime = 0;
 
-            if (id !== 'se_btm') {
-                _duckBgm();
+            // se_btm：BGM操作なし・即再生
+            if (id === 'se_btm') {
+                el.currentTime = 0;
+                el.play().catch(() => {});
+                return;
+            }
+
+            // se_win / se_lose：BGMを完全停止してSEのみ（終了後もBGMは再開しない）
+            if (SE_STOP_BGM.has(id)) {
+                _stopAllBgmNow();
+                el.currentTime = 0;
+                el.play().catch(() => {});
+                return;
+            }
+
+            // se_change：BGMを停止してSE再生、終了後にselectBgmを再開
+            if (id === 'se_change') {
+                _stopAllBgmNow();
+                el.currentTime = 0;
                 el.play().catch(() => {});
                 el.addEventListener('ended', () => {
-                    _unduckBgm();
+                    playSelectBgm();
                 }, { once: true });
                 return;
             }
 
+            // その他SE（se_star, se_punch 等）：ダッキングして再生
+            _duckBgm();
+            el.currentTime = 0;
             el.play().catch(() => {});
+            el.addEventListener('ended', () => {
+                _unduckBgm();
+            }, { once: true });
         }
         function skipIntro() {
             clearAllIntroTimers();
@@ -2960,9 +2990,9 @@
             document.getElementById('battleScreen').classList.remove('active');
             document.getElementById('characterSelectScreen').style.display = 'flex';
             syncMobileBar();
-            // se_changeのSEが終わってからセレクトBGMを開始
+            // se_changeのSE終了後にセレクトBGMを再開
             const seEl = document.getElementById('se_change');
-            if (seEl && !seEl.paused) {
+            if (seEl) {
                 seEl.addEventListener('ended', () => {
                     playSelectBgm();
                 }, { once: true });
