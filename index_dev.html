@@ -1078,7 +1078,9 @@
         <header style="position:relative;">
             <img src="./images/logo.png" alt="江戸戯掛 札戦" style="height:48px; object-fit:contain; display:block; margin:0 auto;">
             <button id="bgmToggle" onclick="toggleBgm()" style="position:absolute; top:12px; right:15px; background:transparent; border:1px solid rgba(212,165,116,0.4); color:#d4a574; font-size:1.2em; padding:5px 10px; min-width:auto; box-shadow:none; border-radius:8px;">🔊</button>
-            <button onclick="playSound('se_btm'); openDrawer()" style="position:absolute; top:12px; left:15px; background:transparent; border:1px solid rgba(212,165,116,0.4); color:#d4a574; font-size:0.75em; padding:5px 12px; min-width:auto; box-shadow:none; border-radius:8px; letter-spacing:0.15em;">MENU</button>
+            <div style="position:absolute; top:12px; left:15px;">
+                <button onclick="playSound('se_btm'); openDrawer()" style="position:relative; background:transparent; border:1px solid rgba(212,165,116,0.4); color:#d4a574; font-size:0.75em; padding:5px 12px; min-width:auto; box-shadow:none; border-radius:8px; letter-spacing:0.15em;">MENU<span id="menuBadge" style="display:none; position:absolute; top:-4px; right:-4px; width:8px; height:8px; background:#e53935; border-radius:50%;"></span></button>
+            </div>
         </header>
 
         <!-- ドロワーメニュー -->
@@ -1091,7 +1093,7 @@
             </div>
             <!-- メニュー項目 -->
             <nav style="flex:1; padding:12px 0;">
-                <button onclick="playSound('se_btm'); closeDrawer(); showMenuScreen('news')"    class="drawer-item">📰 最新情報</button>
+                <button onclick="playSound('se_btm'); closeDrawer(); showMenuScreen('news')"    class="drawer-item" style="position:relative;">📰 最新情報<span id="newsBadge" style="display:none; position:absolute; top:50%; right:16px; transform:translateY(-50%); width:8px; height:8px; background:#e53935; border-radius:50%;"></span></button>
                 <button onclick="playSound('se_btm'); closeDrawer(); showMenuScreen('howto')"   class="drawer-item">📖 遊び方</button>
                 <button onclick="playSound('se_btm'); closeDrawer(); showMenuScreen('charas')"  class="drawer-item">⚔ キャラクター</button>
                 <button onclick="playSound('se_btm'); closeDrawer(); showMenuScreen('credit')"             class="drawer-item">🎬 CREDIT</button>
@@ -1113,8 +1115,9 @@
         <div id="characterSelectScreen">
             <div class="select-title-row">
                 <div class="select-title">キャラクターを選択してください</div>
-                <div style="position:relative; z-index:1; flex-shrink:0;">
+                <div style="position:relative; z-index:1; flex-shrink:0; display:flex; gap:6px;">
                     <button onclick="playSound('se_btm'); openDifficultySelect()" style="background:transparent; border:1px solid rgba(212,165,116,0.4); color:#a08060; font-size:0.72em; padding:6px 18px; min-width:auto; box-shadow:none; border-radius:8px; letter-spacing:0.15em;">難易度：<span id="currentDiffLabel">平</span></button>
+                    <button onclick="playSound('se_btm'); showMenuScreen('howto')" style="background:transparent; border:1px solid rgba(212,165,116,0.4); color:#a08060; font-size:0.72em; padding:6px 14px; min-width:auto; box-shadow:none; border-radius:8px; letter-spacing:0.15em;">📖 遊び方</button>
                 </div>
             </div>
             <div class="character-carousel">
@@ -1323,7 +1326,7 @@
                 body: `
                     <div style="display:flex; flex-direction:column; gap:0;">
                         <div style="border-bottom:1px solid rgba(212,165,116,0.15); padding:18px 0;">
-                            <div style="color:#d4a574; font-size:0.78em; letter-spacing:0.12em; margin-bottom:8px;">2026.03.15</div>
+                            <div style="color:#d4a574; font-size:0.78em; letter-spacing:0.12em; margin-bottom:8px;">2026.03.16</div>
                             <div style="color:#e8e0d0; line-height:1.8; margin-bottom:4px;">アップデートしました。</div>
                             <div style="color:#aaa; font-size:0.9em; line-height:1.8;">・難易度を変更できるようにしました</div>
                             <div style="color:#aaa; font-size:0.9em; line-height:1.8;">・効果音を追加しました</div>
@@ -1515,6 +1518,16 @@
             }
         };
 
+        // 最新情報の最新日付（更新時はここを変える）
+        const LATEST_NEWS_DATE = '2026.03.16';
+
+        function updateNewsBadge() {
+            const read = localStorage.getItem('newsReadDate');
+            const hasUnread = read !== LATEST_NEWS_DATE;
+            document.getElementById('menuBadge').style.display = hasUnread ? 'block' : 'none';
+            document.getElementById('newsBadge').style.display = hasUnread ? 'block' : 'none';
+        }
+
         function showMenuScreen(key) {
             const content = menuScreenContent[key];
             document.getElementById('menuScreenTitle').textContent = content.title;
@@ -1522,6 +1535,11 @@
             const screen = document.getElementById('menuScreen');
             screen.style.display = 'flex';
             screen.scrollTop = 0;
+            // 最新情報を開いたら既読にする
+            if (key === 'news') {
+                localStorage.setItem('newsReadDate', LATEST_NEWS_DATE);
+                updateNewsBadge();
+            }
         }
         function closeMenuScreen() {
             document.getElementById('menuScreen').style.display = 'none';
@@ -1732,6 +1750,7 @@
             document.documentElement.style.setProperty('--img-max-h', imgMaxH + 'px');
             runIntro();
             document.body.addEventListener('click', () => { playSelectBgm(); }, { once: true });
+            updateNewsBadge();
         }
 
         // キャラ選択画面を描画（無限ループカルーセル）
