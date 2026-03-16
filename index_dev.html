@@ -1569,16 +1569,19 @@
                     _bgmResumeTarget = activeBgm;
                 }
 
+                const alreadyPlaying = _playingSEs.has(el);
                 _playingSEs.add(el);
                 el.play().catch(() => {});
-                el.addEventListener('ended', () => {
-                    _playingSEs.delete(el);
-                    // 全SEが終わった時だけBGMを再開
-                    if (_playingSEs.size === 0 && _bgmResumeTarget && _bgmResumeTarget.paused && bgmEnabled) {
-                        _bgmResumeTarget.play().catch(() => {});
-                        _bgmResumeTarget = null;
-                    }
-                }, { once: true });
+                if (!alreadyPlaying) {
+                    el.addEventListener('ended', () => {
+                        _playingSEs.delete(el);
+                        // 全SEが終わった時だけBGMを再開
+                        if (_playingSEs.size === 0 && _bgmResumeTarget && _bgmResumeTarget.paused && bgmEnabled) {
+                            _bgmResumeTarget.play().catch(() => {});
+                            _bgmResumeTarget = null;
+                        }
+                    }, { once: true });
+                }
                 return;
             }
 
@@ -2623,6 +2626,13 @@
 
             // ポップアップ表示
             if (gameOver) {
+                // 勝利・敗北時はse_starを止めてse_win/se_loseだけ鳴らす
+                const starEl = document.getElementById('se_star');
+                if (starEl && !starEl.paused) {
+                    starEl.pause();
+                    starEl.currentTime = 0;
+                    _playingSEs.delete(starEl);
+                }
                 if (finalWinner === 'player') {
                     showPopup(true);
                 } else if (finalWinner === 'enemy') {
