@@ -1269,6 +1269,9 @@
 
         function playSelectBgm() {
             if (!bgmEnabled) return;
+            // ダッキング状態をリセット
+            if (_duckTimer) { clearTimeout(_duckTimer); _duckTimer = null; }
+            _duckingCount = 0;
             const battle = document.getElementById('battleBgm');
             const select = document.getElementById('selectBgm');
             battle.pause(); battle.currentTime = 0;
@@ -1277,6 +1280,9 @@
         }
         function playBattleBgm() {
             if (!bgmEnabled) return;
+            // ダッキング状態をリセット
+            if (_duckTimer) { clearTimeout(_duckTimer); _duckTimer = null; }
+            _duckingCount = 0;
             const battle = document.getElementById('battleBgm');
             const select = document.getElementById('selectBgm');
             select.pause(); select.currentTime = 0;
