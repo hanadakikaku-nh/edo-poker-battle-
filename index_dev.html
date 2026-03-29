@@ -9,17 +9,34 @@
     <!-- 例: G-XXXXXXXXXX -->
   
     <script>
-        window.dataLayer = window.dataLayer || [];
-        function gtag(){dataLayer.push(arguments);}
+        // GA は同意後にのみロード（同意前の通信ゼロを保証）
+        const GA_ID = 'G-6C0TEE5JWB';
+        let _gaLoaded = false;
         const _isDev = location.pathname.endsWith('_dev.html')
-                    || location.protocol === 'file:';
-        if (!_isDev) {
+                    || location.protocol === 'file:'
+                    || location.hostname === 'localhost'
+                    || location.hostname === '127.0.0.1';
+
+        function loadGA() {
+            if (_gaLoaded || _isDev) return;
+            _gaLoaded = true;
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            window.gtag = gtag;
             const _s = document.createElement('script');
             _s.async = true;
-            _s.src = 'https://www.googletagmanager.com/gtag/js?id=G-6C0TEE5JWB';
+            _s.src = `https://www.googletagmanager.com/gtag/js?id=${GA_ID}`;
             document.head.appendChild(_s);
             gtag('js', new Date());
-            gtag('config', 'G-6C0TEE5JWB');
+            gtag('config', GA_ID);
+        }
+
+        // gtag が未定義の場合に呼ばれても無害になるよう定義しておく
+        window.gtag = window.gtag || function(){};
+
+        // GAイベント送信ガード（GA未ロード時のエラー防止）
+        function safeGtag(...args) {
+            if (typeof gtag === 'function') gtag(...args);
         }
     </script>
   
@@ -2315,6 +2332,7 @@
         function initConsentBanner() {
             if (localStorage.getItem('gaConsent') === 'agreed') {
                 // 同意済み：バナー非表示、ボタン有効化済み扱い
+                loadGA();
                 enableStartBtn();
                 return;
             }
@@ -2324,6 +2342,7 @@
         }
         function agreeConsent() {
             localStorage.setItem('gaConsent', 'agreed');
+            loadGA();
             document.getElementById('consentBanner').style.display = 'none';
             enableStartBtn();
         }
@@ -2476,7 +2495,7 @@
         function selectDifficulty(level) {
             currentDifficulty = level;
             // GA4: 難易度選択イベント
-            gtag('event', 'difficulty_select', { difficulty: level });
+            safeGtag('event', 'difficulty_select', { difficulty: level });
             document.getElementById('difficultyScreen').classList.remove('show');
             updateDiffLabels();
         }
@@ -2822,13 +2841,13 @@
             if (!selectedCharacter) return;
 
             // GA4: ゲーム開始イベント
-            gtag('event', 'game_start', {
+            safeGtag('event', 'game_start', {
                 character_name: selectedCharacter.name,
                 character_id: selectedCharacter.id
             });
 
             // GA4: キャラクター選択イベント
-            gtag('event', 'character_select', {
+            safeGtag('event', 'character_select', {
                 character_name: selectedCharacter.name,
                 character_id: selectedCharacter.id,
                 character_job: selectedCharacter.job
@@ -3560,7 +3579,7 @@
             if (isWin === true) {
                 playSound('se_win');
                 // GA4: 勝利イベント
-                gtag('event', 'battle_result', {
+                safeGtag('event', 'battle_result', {
                     result: 'win',
                     character_name: selectedCharacter.name,
                     enemy_name: enemyCharacter.name,
@@ -3575,7 +3594,7 @@
             } else if (isWin === false) {
                 playSound('se_lose');
                 // GA4: 敗北イベント
-                gtag('event', 'battle_result', {
+                safeGtag('event', 'battle_result', {
                     result: 'lose',
                     character_name: selectedCharacter.name,
                     enemy_name: enemyCharacter.name,
@@ -3589,7 +3608,7 @@
                 document.getElementById('popupButton').onclick = () => { playSound('se_btm'); nextBattle(); };
             } else if (isWin === 'draw') {
                 // GA4: 引き分けイベント
-                gtag('event', 'battle_result', {
+                safeGtag('event', 'battle_result', {
                     result: 'draw',
                     character_name: selectedCharacter.name,
                     enemy_name: enemyCharacter.name,
@@ -3610,7 +3629,10 @@
                 roundResultLines.forEach(l => {
                     const rr = document.createElement('div');
                     rr.style.cssText = 'text-align:center; color:#ffd700; font-size:1em; font-weight:bold; margin-bottom:10px;';
-                    rr.innerHTML = l.replace(/\n/g, '<br>');
+                    l.split('\n').forEach((line, i, arr) => {
+                        rr.appendChild(document.createTextNode(line));
+                        if (i < arr.length - 1) rr.appendChild(document.createElement('br'));
+                    });
                     popupContent.appendChild(rr);
                 });
                 document.getElementById('popupButton').textContent = T().nextRoundBtn;
@@ -3626,7 +3648,10 @@
                 roundResultLines.forEach(l => {
                     const rr = document.createElement('div');
                     rr.style.cssText = 'text-align:center; color:#c9a870; font-size:0.88em; margin-bottom:10px;';
-                    rr.innerHTML = l.replace(/\n/g, '<br>');
+                    l.split('\n').forEach((line, i, arr) => {
+                        rr.appendChild(document.createTextNode(line));
+                        if (i < arr.length - 1) rr.appendChild(document.createElement('br'));
+                    });
                     popupContent.appendChild(rr);
                 });
             }
@@ -3706,7 +3731,7 @@
             document.getElementById('popupOverlay').classList.remove('show');
 
             // GA4: 続けてプレイイベント
-            gtag('event', 'continue_game', {
+            safeGtag('event', 'continue_game', {
                 character_name: selectedCharacter.name,
                 character_id: selectedCharacter.id
             });
